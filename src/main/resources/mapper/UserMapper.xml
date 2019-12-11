@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fanr.graduation.mapper.UserMapper">
+
+    <resultMap id="userMap" type="com.fanr.graduation.entity.User">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="username" property="username" jdbcType="VARCHAR"/>
+        <result column="password" property="password" jdbcType="v"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="email" property="email" jdbcType="VARCHAR"/>
+        <result column="create_time" property="create_time" jdbcType="VARCHAR"/>
+        <result column="file_num" property="file_num" jdbcType="INTEGER"/>
+        <result column="volume" property="volume" jdbcType="VARCHAR"/>
+        <result column="user_id" property="user_id" jdbcType="VARCHAR"/>
+        <result column="login_time" property="login_time" jdbcType="VARCHAR"/>
+    </resultMap>
+
+
+    <select id="queryUserList" resultType="com.fanr.graduation.entity.User">
+        select *
+        from user
+    </select>
+
+    <!--登录-->
+    <select id="login" resultType="com.fanr.graduation.entity.User">
+        select *
+        from user
+        where username = #{param1}
+          and password = #{param2}
+    </select>
+
+    <!--//更改用户账号使用情况-->
+    <update id="updateUser" parameterType="com.fanr.graduation.entity.User">
+        UPDATE user
+        <set>
+            <if test="username != null and username != ''">
+                username = #{username},
+            </if>
+            <if test="password != null and password != ''">
+                password = #{password},
+            </if>
+            <if test="phone != null and phone != ''">
+                phone = #{phone},
+            </if>
+            <if test="email != null and email != ''">
+                email = #{email},
+            </if>
+            <if test="create_time != null and create_time != ''">
+                create_time = #{create_time},
+            </if>
+            <if test="file_num != null and file_num != ''">
+                file_num = #{file_num},
+            </if>
+            <if test="volume != null and volume != ''">
+                volume = #{volume},
+            </if>
+            <if test="user_id != null and user_id != ''">
+                user_id = #{user_id},
+            </if>
+            <if test="usertype != null and usertype != ''">
+                usertype = #{usertype},
+            </if>
+            <if test="login_time != null and login_time != ''">
+                login_time = #{login_time},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+
+    <!-- 注册 -->
+    <insert id="register" parameterType="com.fanr.graduation.entity.User">
+        insert into user(username, password, phone, email, create_time, file_num, volume, user_id, usertype, login_time
+        )
+        VALUE
+        (
+        #{username}
+        ,
+        #{password}
+        ,
+        #{phone}
+        ,
+        #{email}
+        ,
+        #{create_time}
+        ,
+        #{file_num}
+        ,
+        #{volume}
+        ,
+        #{user_id}
+        ,
+        #{usertype}
+        ,
+        #{login_time}
+        )
+    </insert>
+
+    <!--删除注销-->
+    <delete id="deleteUser" parameterType="string">
+        delete from user where id = #{id}
+    </delete>
+
+    <!--查询单个用户-->
+    <select id="getUser" resultType="com.fanr.graduation.entity.User">
+        select * from user where id = #{id}
+    </select>
+
+    <!--批量查询用户-->
+    <select id="getAll" resultMap="userMap">
+        select * from user limit #{limit},#{page}
+    </select>
+
+</mapper>

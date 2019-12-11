@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fanr.graduation.mapper.FileMapper">
+
+    <resultMap type="com.fanr.graduation.entity.File" id="fileMap">
+        <result property="id" column="ID" jdbcType="INTEGER"/>
+        <result property="fileName" column="filename" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="VARCHAR"/>
+        <result property="size" column="size" jdbcType="VARCHAR"/>
+        <result property="path" column="path" jdbcType="VARCHAR"/>
+        <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+        <result property="fileType" column="file_type" jdbcType="VARCHAR"/>
+        <result property="shareNum" column="share_num" jdbcType="INTEGER"/>
+        <result property="fileProperty" column="file_property" jdbcType="INTEGER"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="queryFileList" resultMap="fileMap">
+          select * from file
+    </select>
+
+</mapper>
