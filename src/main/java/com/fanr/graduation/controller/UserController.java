@@ -71,15 +71,16 @@ public class UserController {
 
     //查询所有
     @GetMapping("/getAll")
-    public Result getAll(String limit,String page){
+    public Result getAll(Integer limit,Integer page){
         if (limit == null){
-            limit = "0";
+            limit = 0;
         }
         if (page == null){
-            page = "10";
+            page = 10;
         }
+        int total = this.userService.getTotal();
         List<User> list = this.userService.getAll(limit,page);
-        return ResultUtil.success();
+        return ResultUtil.success(total,list);
     }
 
     //删除 注销 用户

@@ -29,6 +29,9 @@ public interface UserService {
     User getUser(String id);
 
     //批量查询用户
-    List<User> getAll(String limit,String page);
+    List<User> getAll(Integer limit,Integer page);
+
+    //获得总数
+    int getTotal();
 
 }

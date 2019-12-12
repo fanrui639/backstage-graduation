@@ -46,8 +46,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAll(String limit, String page) {
+    public List<User> getAll(Integer limit, Integer page) {
         return this.userMapper.getAll(limit,page);
+    }
+
+    @Override
+    public int getTotal() {
+        return this.userMapper.getTotal();
     }
 
 

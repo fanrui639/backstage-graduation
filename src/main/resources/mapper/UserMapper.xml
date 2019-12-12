@@ -5,13 +5,14 @@
     <resultMap id="userMap" type="com.fanr.graduation.entity.User">
         <result column="id" property="id" jdbcType="INTEGER"/>
         <result column="username" property="username" jdbcType="VARCHAR"/>
-        <result column="password" property="password" jdbcType="v"/>
+        <result column="password" property="password" jdbcType="VARCHAR"/>
         <result column="phone" property="phone" jdbcType="VARCHAR"/>
         <result column="email" property="email" jdbcType="VARCHAR"/>
         <result column="create_time" property="create_time" jdbcType="VARCHAR"/>
         <result column="file_num" property="file_num" jdbcType="INTEGER"/>
         <result column="volume" property="volume" jdbcType="VARCHAR"/>
         <result column="user_id" property="user_id" jdbcType="VARCHAR"/>
+        <result column="usertype" property="usertype" jdbcType="VARCHAR"/>
         <result column="login_time" property="login_time" jdbcType="VARCHAR"/>
     </resultMap>
 
@@ -108,7 +109,13 @@
 
     <!--批量查询用户-->
     <select id="getAll" resultMap="userMap">
-        select * from user limit #{limit},#{page}
+        select * from user limit #{param1},#{param2}
     </select>
+
+    <!--获得总数-->
+    <select id="getTotal" resultType="int">
+        select count(*) from user
+    </select>
+
 
 </mapper>
