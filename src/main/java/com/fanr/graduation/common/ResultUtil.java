@@ -1,11 +1,16 @@
 package com.fanr.graduation.common;
 
+import java.util.Map;
+
 /**
  * @author: fanr639
  * @create: 2019-11-27 15:28:55
  * @description:
  */
 public class ResultUtil {
+
+    public ResultUtil(Map map) {
+    }
 
     public static Result success() {
         Result result = new Result();

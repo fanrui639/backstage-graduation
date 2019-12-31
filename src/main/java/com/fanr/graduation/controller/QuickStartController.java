@@ -1,10 +1,10 @@
 package com.fanr.graduation.controller;
 
-import com.fanr.graduation.entity.File;
+import com.fanr.graduation.entity.MyFile;
 import com.fanr.graduation.entity.User;
 import com.fanr.graduation.mapper.UserMapper;
 import com.fanr.graduation.common.MD5Util;
-import com.fanr.graduation.service.FileService;
+import com.fanr.graduation.service.MyFileService;
 import com.fanr.graduation.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +19,7 @@ import java.util.List;
 public class QuickStartController {
 
     @Autowired
-    private FileService fileService;
+    private MyFileService myFileService;
 
     @Autowired
     private UserService userService;
@@ -34,9 +34,9 @@ public class QuickStartController {
     }
 
     @GetMapping("/queryFile")
-    public List<File> queryFile(){
+    public List<MyFile> queryFile(){
         System.out.println("已经进入方法了====================================================");
-        List<File> list = this.fileService.queryFileList();
+        List<MyFile> list = null; // this.fileService.queryFileList();
         System.out.println("方法结束====================");
         return list;
     }

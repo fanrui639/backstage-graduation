@@ -10,8 +10,10 @@ import com.fanr.graduation.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.HttpSessionRequiredException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor;
 import sun.misc.Request;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -24,8 +26,8 @@ public class UserController {
     private UserService userService;
 
     //登录
-    @GetMapping("/login")
-    public Result login(String username, String password, HttpSession session){
+    @PostMapping("/login")
+    public Result login(String username, String password, HttpServletRequest request){
         String mypwd = MD5Util.getMd5(password);
         User user = this.userService.login(username,mypwd);
         if(user != null){
@@ -35,7 +37,7 @@ public class UserController {
         }else{
             return ResultUtil.error(0,"登录失败");
         }
-
+        HttpSession session = request.getSession();
         session.setAttribute("user",user);
 
         return ResultUtil.success(user);

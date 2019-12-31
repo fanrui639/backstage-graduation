@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
 
-public class File {
+public class MyFile {
 
     //文件或文件夹标号
     private int id;
@@ -17,7 +17,7 @@ public class File {
     private Date createTime;
 
     //文件大小
-    private String size;
+    private int size;
 
     //文件路径
     private String path;
@@ -37,7 +37,7 @@ public class File {
     //提取码
     private String code;
 
-    public File() {
+    public MyFile() {
     }
 
     public int getId() {
@@ -64,11 +64,11 @@ public class File {
         this.createTime = createTime;
     }
 
-    public String getSize() {
+    public int getSize() {
         return size;
     }
 
-    public void setSize(String size) {
+    public void setSize(int size) {
         this.size = size;
     }
 
@@ -122,7 +122,7 @@ public class File {
 
     @Override
     public String toString() {
-        return "File{" +
+        return "MyFile{" +
                 "id=" + id +
                 ", fileName='" + fileName + '\'' +
                 ", createTime=" + createTime +
