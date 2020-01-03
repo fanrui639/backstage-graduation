@@ -32,7 +32,6 @@ public class UserController {
         User user = this.userService.login(username,mypwd);
         if(user != null){
             user.setLoginTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-            System.out.println(user.getPassword());
             int result = this.userService.updateUser(user);
         }else{
             return ResultUtil.error(0,"登录失败");

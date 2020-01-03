@@ -67,7 +67,7 @@
     </select>
 
     <!--分页查询所有-->
-    <select id="queryAllByLimit" resultMap="FileMap">
+    <select id="queryAllByLimit" resultMap="fileMap">
         select
         <include refid="Base_Column_List"/>
         from graduation.file
@@ -76,7 +76,7 @@
     </select>
 
     <!--通过实体作为筛选条件查询-->
-    <select id="queryAll" resultMap="FileMap">
+    <select id="queryAll" resultMap="fileMap">
         select
         <include refid="Base_Column_List"/>
         from graduation.file

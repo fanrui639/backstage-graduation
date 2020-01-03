@@ -18,4 +18,22 @@ public interface MyFileMapper {
     //根据id查文件信息
     MyFile queryById(String fileId);
 
+    //查询总条数
+    long count();
+
+    //分页查询所有
+    List<MyFile> queryAllByLimit(String start,String length);
+
+    //通过实体作为筛选条件查询
+    List<MyFile> queryAll();
+
+    //新增所有列
+    int insert(MyFile myFile);
+
+    //修改
+    int update(MyFile myFile);
+
+    //删除
+    int deleteById(String id);
+
 }
