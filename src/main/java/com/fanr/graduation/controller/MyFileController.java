@@ -19,7 +19,7 @@ import java.util.Map;
 import com.fanr.graduation.entity.MyFile;
 
 @RestController
-@RequestMapping("/file")
+@RequestMapping("/api/file")
 public class MyFileController {
 
     @Autowired
