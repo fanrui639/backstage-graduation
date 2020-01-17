@@ -131,6 +131,30 @@ public class UserController {
 
     }
 
+    //页面初始化
+    @GetMapping("/init")
+    public Result init(HttpServletRequest request){
+        HttpSession session = request.getSession();
+
+        User user = (User) session.getAttribute("user");
+
+        if(user != null){
+            return ResultUtil.success(user);
+        }
+        Map map = new HashMap();
+        map.put("id",-1);
+        return ResultUtil.success(map);
+    }
+
+    //退出登录
+    @GetMapping("/loginOut")
+    public Result loginOut(HttpServletRequest request){
+        HttpSession session = request.getSession();
+        session.removeAttribute("user");
+        return ResultUtil.success();
+    }
+
+
     //根据长度生成随机数
     public String createCode(int len) {
         String s = "";
