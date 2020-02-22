@@ -12,8 +12,8 @@ public class SmsSample {
  
     public static void sendMsg(String phone,String msg){
  
-        String testUsername = "fanr639"; //在短信宝注册的用户名
-        String testPassword = "fan201314"; //在短信宝注册的密码
+        String testUsername = "*******"; //在短信宝注册的用户名
+        String testPassword = "*********"; //在短信宝注册的密码
         String testPhone = phone;
         String testContent = msg; // 注意测试时，也请带上公司简称或网站签名，发送正规内容短信。千万不要发送无意义的内容：例如 测一下、您好。否则可能会收不到
  
