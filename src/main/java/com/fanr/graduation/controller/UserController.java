@@ -59,11 +59,14 @@ public class UserController {
         user.setUserId(username);
 
         String sendMsgCode = (String) session.getAttribute("sendMsgCode");
-
-        if(!verifyCoe.equals(sendMsgCode)){
-            return ResultUtil.error(0,"请输入正确的验证码！");
+        if(sendMsgCode != null){
+            if(!verifyCoe.equals(sendMsgCode)){
+                return ResultUtil.error(0,"请输入正确的验证码！");
+            }else{
+                int result = this.userService.register(user);
+            }
         }else{
-            int result = this.userService.register(user);
+            return ResultUtil.error(0,"请输入正确的验证码！");
         }
 
         return ResultUtil.success();
@@ -117,6 +120,8 @@ public class UserController {
         String code = createCode(4);
 
         session.setAttribute("sendMsgCode",code);
+
+        System.out.println("code = " + code);
 
         String msg = "【便利网盘】您的验证码是" + code + ",５分钟内有效。若非本人操作请忽略此消息。";
 
