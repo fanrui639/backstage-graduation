@@ -1,12 +1,11 @@
 package com.fanr.graduation.controller;
 
-import com.fanr.graduation.common.MD5Util;
-import com.fanr.graduation.common.Result;
-import com.fanr.graduation.common.ResultUtil;
-import com.fanr.graduation.common.SmsSample;
+import com.fanr.graduation.common.*;
 import com.fanr.graduation.entity.User;
 import com.fanr.graduation.mapper.UserMapper;
 import com.fanr.graduation.service.UserService;
+import lombok.extern.java.Log;
+import org.omg.IOP.ExceptionDetailMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.HttpSessionRequiredException;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +13,9 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestResponseBody
 import sun.misc.Request;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.rmi.server.ExportException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -44,7 +45,7 @@ public class UserController {
 
     //注册
     @PostMapping("/register")
-    public Result register(String username,String password,String phone,String email,String verifyCoe,HttpSession session){
+    public Result register(String username,String password,String phone,String email,String verifyCode,HttpSession session){
 
         User user = new User();
         user.setUsername(username);
@@ -58,12 +59,15 @@ public class UserController {
         user.setLoginTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         user.setUserId(username);
 
+        session.setAttribute("sendMsgCode","test");
+
         String sendMsgCode = (String) session.getAttribute("sendMsgCode");
         if(sendMsgCode != null){
-            if(!verifyCoe.equals(sendMsgCode)){
+            if(!verifyCode.equals(sendMsgCode)){
                 return ResultUtil.error(0,"请输入正确的验证码！");
             }else{
-                int result = this.userService.register(user);
+                System.out.println("开始存入数据库");
+//                int result = this.userService.register(user);
             }
         }else{
             return ResultUtil.error(0,"请输入正确的验证码！");
@@ -125,14 +129,16 @@ public class UserController {
 
         String msg = "【便利网盘】您的验证码是" + code + ",５分钟内有效。若非本人操作请忽略此消息。";
 
-        SmsSample.sendMsg(phone,msg);  //调用短信宝发送短信
+        String result = SmsSample.sendMsg(phone,msg);  //调用短信宝发送短信
+        if(result.equals("0")){
+            Map map = new HashMap();
+            map.put("code",0);
+            map.put("msg","发送短信成功");
 
-
-        Map map = new HashMap();
-        map.put("code",0);
-        map.put("msg","发送短信成功");
-
-        return ResultUtil.success(map);
+            return ResultUtil.success(map);
+        }else{
+            return ResultUtil.error(500,"服务出错");
+        }
 
     }
 
@@ -157,6 +163,32 @@ public class UserController {
         HttpSession session = request.getSession();
         session.removeAttribute("user");
         return ResultUtil.success();
+    }
+
+    //用户名不重复
+    @GetMapping("/checkUsername")
+    public Result checkUsername(String username){
+        int result = this.userService.checkUsername(username);
+        if(result != 0) {
+            return ResultUtil.error(500,"用户名已存在");
+        }else{
+            return ResultUtil.success();
+        }
+    }
+
+    //图片验正码
+    @GetMapping("/createImg")
+    public void createImg(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        try {
+            response.setContentType("image/jpeg");//设置相应类型,告诉浏览器输出的内容为图片
+            response.setHeader("Pragma", "No-cache");//设置响应头信息，告诉浏览器不要缓存此内容
+            response.setHeader("Cache-Control", "no-cache");
+            response.setDateHeader("Expire", 0);
+            VerifyUtil randomValidateCode = new VerifyUtil();
+            randomValidateCode.getRandcode(request, response);//输出验证码图片
+        }catch (Exception e){
+            System.out.println("e = " + e);
+        }
     }
 
 

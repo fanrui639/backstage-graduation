@@ -38,6 +38,9 @@ public class User {
     //电子邮箱
     private String email;
 
+    //手机验证码
+    private String verifyCoe;
+
 
     //无参构造函数
     public User() {
@@ -131,6 +134,14 @@ public class User {
         this.email = email;
     }
 
+    public String getVerifyCoe() {
+        return verifyCoe;
+    }
+
+    public void setVerifyCoe(String verifyCoe) {
+        this.verifyCoe = verifyCoe;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -145,6 +156,7 @@ public class User {
                 ", login_time='" + login_time + '\'' +
                 ", phone='" + phone + '\'' +
                 ", email='" + email + '\'' +
+                ", verifyCode='" + verifyCoe +'\'' +
                 '}';
     }
 }

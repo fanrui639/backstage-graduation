@@ -55,5 +55,10 @@ public class UserServiceImpl implements UserService {
         return this.userMapper.getTotal();
     }
 
+    @Override
+    public int checkUsername(String username) {
+        return this.userMapper.checkUsername(username);
+    }
+
 
 }

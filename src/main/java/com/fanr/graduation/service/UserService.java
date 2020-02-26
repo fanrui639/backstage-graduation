@@ -34,4 +34,7 @@ public interface UserService {
     //获得总数
     int getTotal();
 
+    //用户名不重复
+    int checkUsername(String username);
+
 }

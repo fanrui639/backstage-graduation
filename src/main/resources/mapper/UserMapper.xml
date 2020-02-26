@@ -117,5 +117,9 @@
         select count(*) from user
     </select>
 
+    <!--用户名不重复-->
+    <select id="checkUsername" resultType="int">
+        select count(*) from user where username = #{username}
+    </select>
 
 </mapper>
