@@ -130,14 +130,40 @@
     </delete>
 
     <!--显示用户所有文件-->
-    <select id="queryFileList" resultMap="fileMap">
-        select * from file where user_id = #{param1} limit #{param2},10
+    <select id="queryFileList" parameterType="int" resultMap="fileMap">
+        select * from graduation.file where user_id = #{0} limit #{1},10
     </select>
 
     <!--上传单个文件-->
     <insert id="uploadFile" keyProperty="id" useGeneratedKeys="true">
         insert into graduation.file(id, filename, create_time, size, path, user_id, file_type, share_num, file_property, code)
-        values (#{id}, #{filename}, #{createTime}, #{size}, #{path}, #{userId}, #{fileType}, #{shareNum}, #{fileProperty}, #{code})
+        values (#{id}, #{fileName}, #{createTime}, #{size}, #{path}, #{userId}, #{fileType}, #{shareNum}, #{fileProperty}, #{code})
     </insert>
+
+    <!-- 查找同名文件id -->
+    <select id="getFileID" resultMap="fileMap">
+        select * from graduation.file where filename = #{param1} and user_id = #{param2}
+    </select>
+
+    <!--显示共享文件-->
+    <select id="getShare" resultMap="fileMap">
+        select * from graduation.file where file_property = 1
+    </select>
+
+    <!--删除文件-->
+    <delete id="deleteFile" parameterType="int">
+        delete from graduation.file where id = #{id}
+    </delete>
+
+    <!--查找单个文件-->
+    <select id="getFileById" resultType="com.fanr.graduation.entity.MyFile">
+        select * from graduation.file where id = #{id}
+    </select>
+
+    <!--分享文件-->
+    <update id="shareFile">
+        update graduation.file set file_property = 1 , code = #{param2} where id = #{param1}
+    </update>
+
 
 </mapper>

@@ -10,7 +10,7 @@ import java.util.List;
 public interface MyFileMapper {
 
 //    @Select("select * from file")
-    List<MyFile> queryFileList(int id,String page);
+    List<MyFile> queryFileList(int id,int page);
 
     //上传单个文件
     int uploadFile(MyFile file);
@@ -34,6 +34,21 @@ public interface MyFileMapper {
     int update(MyFile myFile);
 
     //删除
-    int deleteById(String id);
+    int deleteById(int id);
+
+    //查找同名文件id
+    MyFile getFileID(String filename,int userId);
+
+    //显示共享文件
+    List<MyFile> getShare();
+
+    //删除文件
+    int deleteFile(Integer id);
+
+    //查找文件
+    MyFile getFileById(int id);
+
+    //分享文件
+    int shareFile(int id,String shareCoe);
 
 }

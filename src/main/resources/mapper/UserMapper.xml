@@ -117,9 +117,14 @@
         select count(*) from user
     </select>
 
-    <!--用户名不重复-->
+    <!--用户名不重复   &lt;&gt; 不等于-->
     <select id="checkUsername" resultType="int">
-        select count(*) from user where username = #{username}
+        select count(*) from user where username = #{param1} and id &lt;&gt; #{param2}
     </select>
+
+    <!--设置用户为管理员-->
+    <update id="setUser" parameterType="int">
+        update graduation.user set usertype = #{param2} where id = #{param1}
+    </update>
 
 </mapper>

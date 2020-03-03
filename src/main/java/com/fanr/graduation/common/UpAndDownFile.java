@@ -45,7 +45,7 @@ public class UpAndDownFile {
             map.put("stat", stat);
             return map;
         }
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath +
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath + "\\" +
                 new File(file.getOriginalFilename())));
         bos.write(file.getBytes());
         bos.flush();
@@ -63,11 +63,11 @@ public class UpAndDownFile {
 //        myfile.setUserId(userId);
 //        myFileService.uploadFile(myfile);
 
-        int result = saveFile(file,filePath,userId);
+//        int result = saveFile(file,filePath,userId);
 
-        if(result > 0){
-            stat = true;
-        }
+//        if(result > 0){
+//            stat = true;
+//        }
 
         map.put("info", "上传成功！");
         map.put("stat", stat);

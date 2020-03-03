@@ -17,7 +17,7 @@ public class MyFileServiceImple implements MyFileService {
 
     //显示用户所有文件
     @Override
-    public List<MyFile> queryFileList(int id, String page) {
+    public List<MyFile> queryFileList(int id, int page) {
         return this.myFileMapper.queryFileList(id,page);
     }
 
@@ -38,4 +38,39 @@ public class MyFileServiceImple implements MyFileService {
     public MyFile queryById(String fileId) {
         return this.myFileMapper.queryById(fileId);
     }
+
+    //查找同名文件id
+    @Override
+    public MyFile getFileID(String filename, int userId) {
+        return this.myFileMapper.getFileID(filename,userId);
+    }
+
+    @Override
+    public int deleteById(int id) {
+        return this.myFileMapper.deleteById(id);
+    }
+
+    @Override
+    public List<MyFile> getShare() {
+        return this.myFileMapper.getShare();
+    }
+
+    //查找单个文件
+    @Override
+    public MyFile getFileById(int id) {
+        return this.myFileMapper.getFileById(id);
+    }
+
+    //删除文件
+    @Override
+    public int deleteFile(Integer id) {
+        return this.myFileMapper.deleteFile(id);
+    }
+
+    //分享文件
+    @Override
+    public int shareFile(int id, String shareCode) {
+        return this.myFileMapper.shareFile(id,shareCode);
+    }
+
 }

@@ -5,18 +5,23 @@ import com.fanr.graduation.common.ResultUtil;
 import com.fanr.graduation.common.UpAndDownFile;
 import com.fanr.graduation.entity.User;
 import com.fanr.graduation.service.MyFileService;
+import org.apache.ibatis.jdbc.Null;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.net.URLEncoder;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import com.fanr.graduation.entity.MyFile;
+import sun.rmi.runtime.RuntimeUtil;
 
 @RestController
 @RequestMapping("/api/file")
@@ -25,20 +30,55 @@ public class MyFileController {
     @Autowired
     private MyFileService MyfileService;
 
-    private final static String path = "G:\\file\\";
+    @Value("${file.path}")
+//    private final static String path = "G:\\file\\";
+    private String path;
 
     //上传单个文件
     @PostMapping("/uploadFile")
     public Result uploadFile(MultipartFile file,HttpServletRequest request) {
 
+        if(file.getSize() == 0){
+            return ResultUtil.error(500,"请不要上传空文件");
+        }
+
+        MyFile myFile = new MyFile();
         HttpSession session = request.getSession();
         User user = (User)session.getAttribute("user");
+
+        //判断是否登陆
+        if(user == null){
+            return ResultUtil.error(500,"请登录后操作");
+        }
+        System.out.println("path = " + path);
         String filePath = path + user.getUsername();
+        System.out.println("filePath = " + filePath);
         int userId = user.getId();
         Map upload = null;
         try {
             upload = UpAndDownFile.upload(filePath,file,userId);
-            System.out.println("upload = " + upload);
+
+            //从数据库中删除同名记录
+            MyFile fileNum= this.MyfileService.getFileID(file.getOriginalFilename(),userId);
+            if(fileNum != null){
+                int delById = this.MyfileService.deleteById(fileNum.getId());
+            }
+
+//            System.out.println("file.getContentType() = " + file.getContentType());
+
+            myFile.setCode("0");
+            myFile.setCreateTime(new Date());
+            myFile.setFileName(file.getOriginalFilename());
+//        myfile.setFileProperty();
+            myFile.setFileType(file.getContentType());
+            myFile.setPath(filePath);
+            myFile.setShareNum(0);
+            myFile.setSize((int) file.getSize());
+            myFile.setUserId(userId);
+            int result = this.MyfileService.uploadFile(myFile);
+            if (result > 0){
+                return ResultUtil.success();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -53,6 +93,12 @@ public class MyFileController {
 
         HttpSession session = request.getSession();
         User user = (User)session.getAttribute("user");
+
+        //判断是否登陆
+        if(user == null){
+            return ResultUtil.error(500,"请登录后操作");
+        }
+
         String filePath = path + user.getUsername();
         int userId = user.getId();
 
@@ -68,7 +114,7 @@ public class MyFileController {
     }
 
     //下载单个文件
-    @GetMapping("downFile/{fileId}")
+    @GetMapping("/downloadFile/{fileId}")
     public Result downloadFile(HttpServletRequest request, HttpServletResponse response,@PathVariable String fileId) throws IOException {
         //得到要下载的文件名
 //        String fileName = URLDecoder.decode(request.getParameter("diarycontent"), "utf-8");
@@ -120,29 +166,105 @@ public class MyFileController {
     }
 
     //下载多个文件
-    @GetMapping("downFiles/{fileList}")
+    @GetMapping("/downFiles/{fileList}")
     public Result downloadFiles(HttpServletResponse response,@PathVariable String fileList) throws IOException{
 
         return ResultUtil.success();
 
     }
 
-
     //显示用户所有文件
     @GetMapping("/getFileList")
-    public Result queryFileList(HttpServletRequest request,String page){
+    public Result queryFileList(HttpServletRequest request,Integer page){
 
-        if (page.equals("") || page.equals(null)){
-            page = "0";
+        if (page == null){
+            page = 0;
         }
 
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
+
+        //判断是否登陆
+        if(user == null){
+            return ResultUtil.error(500,"请登录后操作");
+        }
+
         int id = user.getId();
+
         List<MyFile> list = this.MyfileService.queryFileList(id, page);
 
         return ResultUtil.success(list);
     }
 
+    //显示共享文件
+    @GetMapping("/getShare")
+    public Result getShare(){
+
+        List<MyFile> list = this.MyfileService.getShare();
+
+        return ResultUtil.success(list);
+    }
+
+    //删除文件
+    @GetMapping("/deleteFile")
+    public Result deleteFile(Integer id){
+        if(id != null) {
+            MyFile myFile = this.MyfileService.getFileById(id);
+
+            int result = this.MyfileService.deleteFile(id);
+
+            if (result > 0) {
+                String path = myFile.getPath() + "\\" + myFile.getFileName();
+
+                System.out.println("path = " + path);
+
+                File targetFile = new File(path);
+                delFile(targetFile);
+            }
+
+            return ResultUtil.success();
+        }else{
+            return ResultUtil.error(500,"请检查您的传值");
+        }
+
+
+    }
+
+    //分享文件
+    @GetMapping("/shareFile")
+    public Result shareFile(Integer id,String shareCode){
+
+        if(shareCode.equals("") || shareCode.equals(null)){
+            shareCode = "0";
+        }
+
+        int result = this.MyfileService.shareFile(id,shareCode);
+
+        return ResultUtil.success();
+    }
+
+    //删除本地文件
+    public static void delFile(File f)
+    {
+
+        //如果是文件夹，递归查找
+        if(f.isDirectory()) {
+            delFile(f);
+        }
+        else if(f.isFile())
+        {
+            //是文件的话，把文件名放到一个字符串中
+            String filename=f.getName();
+            //如果是“class”后缀文件，返回一个boolean型的值
+            if(filename.endsWith("class"))
+            {
+                System.out.println("成功删除：："+f.getName());
+                //file.delete();
+            }else{
+                System.out.println("开始删除");
+                f.delete();
+            }
+        }
+    }
 
 }

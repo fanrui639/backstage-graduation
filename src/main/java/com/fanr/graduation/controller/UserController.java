@@ -2,20 +2,13 @@ package com.fanr.graduation.controller;
 
 import com.fanr.graduation.common.*;
 import com.fanr.graduation.entity.User;
-import com.fanr.graduation.mapper.UserMapper;
 import com.fanr.graduation.service.UserService;
-import lombok.extern.java.Log;
-import org.omg.IOP.ExceptionDetailMessage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.HttpSessionRequiredException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor;
-import sun.misc.Request;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.rmi.server.ExportException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -28,9 +21,20 @@ public class UserController {
 
     //登录
     @PostMapping("/login")
-    public Result login(String username, String password, HttpServletRequest request){
+    public Result login(String username, String password,String verifyCode, HttpServletRequest request){
         String mypwd = MD5Util.getMd5(password);
-        User user = this.userService.login(username,mypwd);
+
+        User user = new User();
+
+        HttpSession verifySession = request.getSession();
+
+        String sessionCode = (String)verifySession.getAttribute(VerifyUtil.RANDOMCODEKEY);
+        if(verifyCode.equals(sessionCode)){
+             user = this.userService.login(username,mypwd);
+        }else{
+            return ResultUtil.error(500,"请输入正确的验证码！！！");
+        }
+
         if(user != null){
             user.setLoginTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
             int result = this.userService.updateUser(user);
@@ -57,7 +61,7 @@ public class UserController {
         user.setVolume("50");
         user.setFileNum(0);
         user.setLoginTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-        user.setUserId(username);
+//        user.setUserId(username);
 
         session.setAttribute("sendMsgCode","test");
 
@@ -66,14 +70,17 @@ public class UserController {
             if(!verifyCode.equals(sendMsgCode)){
                 return ResultUtil.error(0,"请输入正确的验证码！");
             }else{
-                System.out.println("开始存入数据库");
-//                int result = this.userService.register(user);
+//                System.out.println("开始存入数据库");
+                int result = this.userService.register(user);
+                if(result > 0){
+                    return ResultUtil.success();
+                }else{
+                    return ResultUtil.error(500,"服务出错！！");
+                }
             }
         }else{
             return ResultUtil.error(0,"请输入正确的验证码！");
         }
-
-        return ResultUtil.success();
 
     }
 
@@ -105,15 +112,14 @@ public class UserController {
         return ResultUtil.success(user);
     }
 
-//    //修改用户
-//    @GetMapping("/updateUser")
-//    public Result updateUser(String id){
-//        return ResultUtil.success();
-//    }
+    //修改用户信息
+    @PostMapping("/updateUser")
+    public Result updateUser(User user){
 
-    //编辑用户信息
-    @PostMapping("/editUser")
-    public Result editUser(User user){
+        System.out.println("user = " + user);
+
+        int result = this.userService.updateUser(user);
+
         return ResultUtil.success();
     }
 
@@ -167,8 +173,11 @@ public class UserController {
 
     //用户名不重复
     @GetMapping("/checkUsername")
-    public Result checkUsername(String username){
-        int result = this.userService.checkUsername(username);
+    public Result checkUsername(String username,Integer id){
+        if(id == null){
+            id = 0;
+        }
+        int result = this.userService.checkUsername(username,id);
         if(result != 0) {
             return ResultUtil.error(500,"用户名已存在");
         }else{
@@ -191,6 +200,14 @@ public class UserController {
         }
     }
 
+    //设置用户为管理员
+    @GetMapping("/setUser")
+    public Result setUser(Integer id,Integer type){
+
+        int result = this.userService.setUser(id,type);
+
+        return ResultUtil.success();
+    }
 
     //根据长度生成随机数
     public String createCode(int len) {
