@@ -30,9 +30,9 @@ public class MyFileController {
     @Autowired
     private MyFileService MyfileService;
 
-    @Value("${file.path}")
-//    private final static String path = "G:\\file\\";
-    private String path;
+    private final static String path = "G:/file/";
+//    private final static String path = "/home/data/";
+
 
     //上传单个文件
     @PostMapping("/uploadFile")
@@ -50,9 +50,7 @@ public class MyFileController {
         if(user == null){
             return ResultUtil.error(500,"请登录后操作");
         }
-        System.out.println("path = " + path);
         String filePath = path + user.getUsername();
-        System.out.println("filePath = " + filePath);
         int userId = user.getId();
         Map upload = null;
         try {
@@ -133,7 +131,7 @@ public class MyFileController {
         //String path = findFileSavePathByFileName(fileName,fileSaveRootPath);
         //String path = fileSaveRootPath;
         //得到要下载的文件
-        File file = new File(fileSaveRootPath + "\\" + fileName);
+        File file = new File(fileSaveRootPath + "/" + fileName);
         //如果文件不存在
         if (!file.exists()) {
 
@@ -145,7 +143,7 @@ public class MyFileController {
         //设置响应头，控制浏览器下载该文件
         response.setHeader("content-disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
         //读取要下载的文件，保存到文件输入流
-        FileInputStream in  = new FileInputStream(fileSaveRootPath + "\\" + fileName);
+        FileInputStream in  = new FileInputStream(fileSaveRootPath + "/" + fileName);
 
         //创建输出流
         OutputStream out = response.getOutputStream();
@@ -214,9 +212,7 @@ public class MyFileController {
             int result = this.MyfileService.deleteFile(id);
 
             if (result > 0) {
-                String path = myFile.getPath() + "\\" + myFile.getFileName();
-
-                System.out.println("path = " + path);
+                String path = myFile.getPath() + "/" + myFile.getFileName();
 
                 File targetFile = new File(path);
                 delFile(targetFile);
@@ -258,10 +254,10 @@ public class MyFileController {
             //如果是“class”后缀文件，返回一个boolean型的值
             if(filename.endsWith("class"))
             {
-                System.out.println("成功删除：："+f.getName());
+//                System.out.println("成功删除：："+f.getName());
                 //file.delete();
             }else{
-                System.out.println("开始删除");
+//                System.out.println("开始删除");
                 f.delete();
             }
         }

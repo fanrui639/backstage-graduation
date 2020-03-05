@@ -8,9 +8,9 @@ spring:
   #数据库配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/graduation?userUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://175.24.88.103:3306/graduation?userUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
     username: root
-    password: 123456
+    password: '@Fan201314'
 
   #时区设置
   jackson:
@@ -30,4 +30,4 @@ mybatis:
 
 ## File Storage Properties
 # Please change this to the path where you want the uploaded files to be stored.
-file.path=G:\\file
+#file.path=G:\\file
