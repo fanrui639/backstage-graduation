@@ -133,7 +133,7 @@ public class UserController {
 
         System.out.println("code = " + code);
 
-        String msg = "【便利网盘】您的验证码是" + code + ",５分钟内有效。若非本人操作请忽略此消息。";
+        String msg = "【639网盘】您的验证码是" + code + ",５分钟内有效。若非本人操作请忽略此消息。";
 
         String result = SmsSample.sendMsg(phone,msg);  //调用短信宝发送短信
         if(result.equals("0")){
@@ -207,6 +207,55 @@ public class UserController {
         int result = this.userService.setUser(id,type);
 
         return ResultUtil.success();
+    }
+
+    //忘记密码中发送验证码
+    @PostMapping("/verifyPhone")
+    public Result verifyPhone(String username,String phone,HttpSession session){
+        int verifyPhone = this.userService.verifyPhone(username,phone);
+        if(verifyPhone > 0){
+            String code = createCode(4);
+
+            session.setAttribute("verifyCode",code);
+
+            String msg = "【639网盘】您的验证码是" + code + ",５分钟内有效。若非本人操作请忽略此消息。";
+
+            String result = SmsSample.sendMsg(phone,msg);  //调用短信宝发送短信
+            if(result.equals("0")){
+                Map map = new HashMap();
+                map.put("code",0);
+                map.put("msg","发送短信成功");
+
+                return ResultUtil.success(map);
+            }else{
+                return ResultUtil.error(500,"服务出错");
+            }
+        }else{
+            return ResultUtil.error(500,"请确认手机号是否属于该账号");
+        }
+    }
+
+    //忘记密码中验证码
+    @PostMapping("/reVerifyCode")
+    public Result reVerifyCode(String verifyCode,HttpSession session){
+        String code = (String)session.getAttribute("verifyCode");
+        if (verifyCode.equals(code)) {
+            return ResultUtil.success();
+        }else{
+            return ResultUtil.error(500,"验证码错误");
+        }
+    }
+
+    //修改密码
+    @PostMapping("/updatePassword")
+    public Result updatePassword(String username,String password){
+        String mypwd = MD5Util.getMd5(password);
+        int result = this.userService.updatePassword(username,mypwd);
+        if(result > 0){
+            return ResultUtil.success();
+        }else{
+            return ResultUtil.error(500,"修改密码失败");
+        }
     }
 
     //根据长度生成随机数

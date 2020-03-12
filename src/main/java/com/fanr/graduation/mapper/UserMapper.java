@@ -38,4 +38,10 @@ public interface UserMapper {
     //设置用户为管理员
     int setUser(int id,int type);
 
+    //忘记密码中验证手机
+    int verifyPhone(String username,String phone);
+
+    //修改密码
+    int updatePassword(String username,String password);
+
 }

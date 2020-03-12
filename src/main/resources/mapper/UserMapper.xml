@@ -127,4 +127,14 @@
         update graduation.user set usertype = #{param2} where id = #{param1}
     </update>
 
+    <!--忘记密码中验证手机号-->
+    <select id="verifyPhone" resultType="java.lang.Integer">
+        select count(*) from graduation.user where username = #{param1} and phone = #{param2}
+    </select>
+
+    <!--修改密码-->
+    <update id="updatePassword">
+        update graduation.user set password = #{param2} where username = #{param1}
+    </update>
+
 </mapper>

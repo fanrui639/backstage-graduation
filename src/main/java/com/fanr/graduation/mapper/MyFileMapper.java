@@ -12,6 +12,9 @@ public interface MyFileMapper {
 //    @Select("select * from file")
     List<MyFile> queryFileList(int id,int page);
 
+    @Select("select count(*) from file where user_id = #{id}")
+    int getFileNum(int id);
+
     //上传单个文件
     int uploadFile(MyFile file);
 
@@ -40,7 +43,13 @@ public interface MyFileMapper {
     MyFile getFileID(String filename,int userId);
 
     //显示共享文件
-    List<MyFile> getShare();
+    List<MyFile> getShare(Integer page);
+
+    @Select("select count(*) from file where file_property = 1")
+    int getTotal();
+
+    //根据搜索内容显示共享文件
+    List<MyFile> getShareBySearch(String searchContext);
 
     //删除文件
     int deleteFile(Integer id);
@@ -50,5 +59,8 @@ public interface MyFileMapper {
 
     //分享文件
     int shareFile(int id,String shareCoe);
+
+    //验证分享码
+    int downShareFile(int id,String code);
 
 }

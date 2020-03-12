@@ -65,5 +65,15 @@ public class UserServiceImpl implements UserService {
         return this.userMapper.setUser(id,type);
     }
 
+    @Override
+    public int verifyPhone(String username, String phone) {
+        return this.userMapper.verifyPhone(username,phone);
+    }
+
+    @Override
+    public int updatePassword(String username, String password) {
+        return this.userMapper.updatePassword(username,password);
+    }
+
 
 }

@@ -21,6 +21,11 @@ public class MyFileServiceImple implements MyFileService {
         return this.myFileMapper.queryFileList(id,page);
     }
 
+    @Override
+    public int getFileNum(int id){
+        return this.myFileMapper.getFileNum(id);
+    }
+
     //上传单个文件
     @Override
     public int uploadFile(MyFile file) {
@@ -51,8 +56,18 @@ public class MyFileServiceImple implements MyFileService {
     }
 
     @Override
-    public List<MyFile> getShare() {
-        return this.myFileMapper.getShare();
+    public List<MyFile> getShare(Integer page) {
+        return this.myFileMapper.getShare(page);
+    }
+
+    @Override
+    public int getTotal(){
+        return this.myFileMapper.getTotal();
+    }
+
+    @Override
+    public List<MyFile> getShareBySearch(String searchContext) {
+        return this.myFileMapper.getShareBySearch(searchContext);
     }
 
     //查找单个文件
@@ -71,6 +86,11 @@ public class MyFileServiceImple implements MyFileService {
     @Override
     public int shareFile(int id, String shareCode) {
         return this.myFileMapper.shareFile(id,shareCode);
+    }
+
+    @Override
+    public int downShareFile(int id, String code) {
+        return this.myFileMapper.downShareFile(id,code);
     }
 
 }

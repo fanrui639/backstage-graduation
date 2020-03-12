@@ -5,13 +5,10 @@ import com.fanr.graduation.common.ResultUtil;
 import com.fanr.graduation.common.UpAndDownFile;
 import com.fanr.graduation.entity.User;
 import com.fanr.graduation.service.MyFileService;
-import org.apache.ibatis.jdbc.Null;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -21,7 +18,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import com.fanr.graduation.entity.MyFile;
-import sun.rmi.runtime.RuntimeUtil;
 
 @RestController
 @RequestMapping("/api/file")
@@ -188,17 +184,30 @@ public class MyFileController {
         }
 
         int id = user.getId();
-
+        int total = this.MyfileService.getFileNum(id);
         List<MyFile> list = this.MyfileService.queryFileList(id, page);
 
-        return ResultUtil.success(list);
+        return ResultUtil.success(total,list);
     }
 
     //显示共享文件
     @GetMapping("/getShare")
-    public Result getShare(){
+    public Result getShare(Integer page){
 
-        List<MyFile> list = this.MyfileService.getShare();
+        if (page == null){
+            page = 0;
+        }
+        int total = this.MyfileService.getTotal();
+        List<MyFile> list = this.MyfileService.getShare(page);
+
+        return ResultUtil.success(total,list);
+
+    }
+
+    //根据搜索内容显示共享文件
+    @GetMapping("/getShareBySearch")
+    public Result getShareBySearch(String searchContext){
+        List<MyFile> list = this.MyfileService.getShareBySearch(searchContext);
 
         return ResultUtil.success(list);
     }
@@ -237,6 +246,19 @@ public class MyFileController {
         int result = this.MyfileService.shareFile(id,shareCode);
 
         return ResultUtil.success();
+    }
+
+    //下载分享文件确认分享码
+    @GetMapping("/downShareFile")
+    public Result downShareFile(Integer id,String code){
+
+        int result = this.MyfileService.downShareFile(id,code);
+
+        if(result > 0) {
+            return ResultUtil.success();
+        }else{
+            return ResultUtil.error(500,"分享码错误！！！");
+        }
     }
 
     //删除本地文件
