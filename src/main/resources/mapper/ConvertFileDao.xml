@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fanr.graduation.mapper.ConvertFileDao">
+
+    <resultMap type="com.fanr.graduation.entity.ConvertFile" id="ConvertFileMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="filename" column="filename" jdbcType="VARCHAR"/>
+        <result property="filesize" column="filesize" jdbcType="NUMERIC"/>
+        <result property="path" column="path" jdbcType="VARCHAR"/>
+        <result property="fileId" column="file_id" jdbcType="INTEGER"/>
+    </resultMap>
+    
+     <!--定义所有字段 sql 片段-->
+    <sql id="Base_Column_List">
+        id, filename, filesize, path, file_id        
+    </sql>
+    
+     <!--定义动态查询 sql 片段-->
+    <sql id="BaseWhere">
+        <where>
+                <if test="filename != null and filename != ''">
+                and filename LIKE CONCAT('%',#{filename},'%')
+            </if>
+                <if test="filesize != null">
+                and filesize = #{filesize}
+            </if>
+                <if test="path != null and path != ''">
+                and path LIKE CONCAT('%',#{path},'%')
+            </if>
+                <if test="fileId != null">
+                and file_id = #{fileId}
+            </if>
+        </where>
+    </sql>
+
+    <!--查询单个-->
+    <select id="queryByFileId" resultType="com.fanr.graduation.entity.ConvertFile">
+        select
+        <include refid="Base_Column_List"/>
+        from graduation.convert_file
+        where file_id = #{id}
+    </select>
+
+    <!--查询是否存在-->
+    <!--<select id="queryById" resultType="int">-->
+        <!--select count(*) from graduation.convert_file where file_id = #{fileId}-->
+    <!--</select>-->
+
+     <!--查询数据总有条数-->
+    <select id="count" resultType="long">
+        select count(*) from graduation.convert_file
+    </select>
+
+    <!--分页查询所有-->
+    <select id="queryAllByLimit" resultMap="ConvertFileMap">
+        select
+            <include refid="Base_Column_List"/>
+        from graduation.convert_file
+            <include refid="BaseWhere"/>
+        limit #{start}, #{length}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="ConvertFileMap">
+        select
+            <include refid="Base_Column_List"/>
+        from graduation.convert_file
+            <include refid="BaseWhere"/>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into graduation.convert_file(id, filename, filesize, path, file_id)
+        values (#{id}, #{filename}, #{filesize}, #{path}, #{fileId})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update graduation.convert_file
+        <set>
+            <if test="filename != null and filename != ''">
+                filename = #{filename},
+            </if>
+            <if test="filesize != null">
+                filesize = #{filesize},
+            </if>
+            <if test="path != null and path != ''">
+                path = #{path},
+            </if>
+            <if test="fileId != null">
+                file_id = #{fileId},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteByFileId">
+        delete from graduation.convert_file where file_id = #{id}
+    </delete>
+
+</mapper>
