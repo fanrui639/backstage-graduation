@@ -3,8 +3,11 @@ package com.fanr.graduation.controller;
 import com.fanr.graduation.common.Result;
 import com.fanr.graduation.common.ResultUtil;
 import com.fanr.graduation.common.UpAndDownFile;
+import com.fanr.graduation.entity.ConvertFile;
 import com.fanr.graduation.entity.User;
+import com.fanr.graduation.service.ConvertFileService;
 import com.fanr.graduation.service.MyFileService;
+import org.jodconverter.office.OfficeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,12 +15,15 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.xml.ws.Response;
 import java.io.*;
 import java.net.URLEncoder;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import com.fanr.graduation.entity.MyFile;
+
+import static com.fanr.graduation.common.Office2PDF.office2pdf;
 
 @RestController
 @RequestMapping("/api/file")
@@ -26,8 +32,11 @@ public class MyFileController {
     @Autowired
     private MyFileService MyfileService;
 
-    private final static String path = "G:/file/";
-//    private final static String path = "/home/data/";
+    @Autowired
+    private ConvertFileService convertFileService;
+
+//    private final static String path = "G:/file/";
+    private final static String path = "/home/data/";
 
 
     //上传单个文件
@@ -216,22 +225,26 @@ public class MyFileController {
     @GetMapping("/deleteFile")
     public Result deleteFile(Integer id){
         if(id != null) {
-            MyFile myFile = this.MyfileService.getFileById(id);
+            MyFile myFile = this.MyfileService.getFileById(id);   //查找文件
+            ConvertFile convertFile = this.convertFileService.queryByFileId(id);    //查找是否被转换过
 
             int result = this.MyfileService.deleteFile(id);
 
             if (result > 0) {
-                String path = myFile.getPath() + "/" + myFile.getFileName();
+                String filepath = myFile.getPath() + "/" + myFile.getFileName();
 
-                File targetFile = new File(path);
+                File targetFile = new File(filepath);
                 delFile(targetFile);
+                if(convertFile != null){
+                    delFile(new File(convertFile.getPath() + convertFile.getFilename()));
+                    this.convertFileService.deleteByFileId(id);
+                }
             }
 
             return ResultUtil.success();
         }else{
             return ResultUtil.error(500,"请检查您的传值");
         }
-
 
     }
 
@@ -259,6 +272,59 @@ public class MyFileController {
         }else{
             return ResultUtil.error(500,"分享码错误！！！");
         }
+    }
+
+    //预览文件
+    @GetMapping("/seeFile")
+    public String seeFile(Integer id, HttpServletResponse response) throws IOException {
+
+        String outFile = "";
+
+        ConvertFile convertfile = this.convertFileService.queryByFileId(id);
+
+        if(convertfile.getId() == null){
+            MyFile file = this.MyfileService.getFileById(id);
+
+            String inFile = file.getPath() + "//" + file.getFileName();
+            String convertpath = path + "convert//";
+            String convertname = file.getFileName().substring(0,file.getFileName().indexOf(".") + 1) + "pdf";
+            outFile =  convertpath + convertname;
+
+            try {
+                Map map = office2pdf(inFile,outFile);    //将文件转换为PDF格式
+                boolean stat = (boolean) map.get("stat");
+                if (stat) {
+                    //将转换后的文件存进数据库
+                    ConvertFile convert = new ConvertFile();
+                    convert.setFilename(convertname);
+                    convert.setPath(convertpath);
+                    File file1 = new File(convertpath + convertname);
+                    convert.setFilesize(Double.valueOf(file1.length()));
+                    convert.setFileId(id);
+                    this.convertFileService.insert(convert);
+                }
+            } catch (OfficeException e) {
+                e.printStackTrace();
+            }
+        }else{
+            outFile = convertfile.getPath() + convertfile.getFilename();
+        }
+
+        File convertFile = new File(outFile);//convertrealpath为你转换好后的文件的绝对路径
+
+        BufferedInputStream br = new BufferedInputStream(new FileInputStream(convertFile));
+        byte[] buf = new byte[1024];
+        int len = 0;
+        response.reset(); // 非常重要
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "inline; filename=" + URLEncoder.encode(convertFile.getName(), "UTF-8"));
+
+        OutputStream out = response.getOutputStream();
+        while ((len = br.read(buf)) > 0)
+            out.write(buf, 0, len);
+        br.close();
+        out.close();
+        return null;
     }
 
     //删除本地文件
