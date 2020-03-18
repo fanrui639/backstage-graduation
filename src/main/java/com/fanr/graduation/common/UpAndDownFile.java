@@ -45,7 +45,7 @@ public class UpAndDownFile {
             map.put("stat", stat);
             return map;
         }
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath + "\\" +
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath + "//" +
                 new File(file.getOriginalFilename())));
         bos.write(file.getBytes());
         bos.flush();
