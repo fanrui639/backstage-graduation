@@ -37,7 +37,7 @@ public class UserController {
 
         if(user != null){
             user.setLoginTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-            int result = this.userService.updateUser(user);
+            User result = this.userService.updateUser(user);
         }else{
             return ResultUtil.error(0,"登录失败");
         }
@@ -63,7 +63,7 @@ public class UserController {
         user.setLoginTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 //        user.setUserId(username);
 
-        session.setAttribute("sendMsgCode","test");
+//        session.setAttribute("sendMsgCode","test");    测试的时候用
 
         String sendMsgCode = (String) session.getAttribute("sendMsgCode");
         if(sendMsgCode != null){
@@ -114,11 +114,13 @@ public class UserController {
 
     //修改用户信息
     @PostMapping("/updateUser")
-    public Result updateUser(User user){
+    public Result updateUser(User user,HttpSession session){
 
         System.out.println("user = " + user);
 
-        int result = this.userService.updateUser(user);
+        User myuser = this.userService.updateUser(user);
+
+        session.setAttribute("user",myuser);
 
         return ResultUtil.success();
     }
@@ -180,6 +182,20 @@ public class UserController {
         int result = this.userService.checkUsername(username,id);
         if(result != 0) {
             return ResultUtil.error(500,"用户名已存在");
+        }else{
+            return ResultUtil.success();
+        }
+    }
+
+    //注册手机号码不能重复
+    @GetMapping("/checkPhone")
+    public Result checkPhone(String phone,Integer id){
+        if(id == null){
+            id = 0;
+        }
+        int result = this.userService.checkPhone(phone,id);
+        if(result != 0) {
+            return ResultUtil.error(500,"该手机号以被注册");
         }else{
             return ResultUtil.success();
         }

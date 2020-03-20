@@ -17,7 +17,7 @@ public interface UserService {
     User login(String username,String password);
 
     //更改用户账号使用情况
-    int updateUser(User user);
+    User updateUser(User user);
 
     //注册
     int register(User user);
@@ -36,6 +36,9 @@ public interface UserService {
 
     //用户名不重复
     int checkUsername(String username,int id);
+
+    //手机号码不重复
+    int checkPhone(String phone,int id);
 
     //设置用户为管理员
     int setUser(int id,int type);

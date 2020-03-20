@@ -35,6 +35,9 @@ public interface UserMapper {
     //用户名不重复
     int checkUsername(String username,int id);
 
+    //手机号不重复
+    int checkPhone(String phone,int id);
+
     //设置用户为管理员
     int setUser(int id,int type);
 

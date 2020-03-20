@@ -71,7 +71,7 @@ public class MyFileController {
             myFile.setCode("0");
             myFile.setCreateTime(new Date());
             myFile.setFileName(file.getOriginalFilename());
-//        myfile.setFileProperty();
+//          myfile.setFileProperty();
             myFile.setFileType(file.getContentType());
             myFile.setPath(filePath);
             myFile.setShareNum(0);

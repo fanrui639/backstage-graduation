@@ -122,6 +122,11 @@
         select count(*) from user where username = #{param1} and id &lt;&gt; #{param2}
     </select>
 
+    <!--手机号不重复   &lt;&gt; 不等于-->
+    <select id="checkPhone" resultType="int">
+        select count(*) from user where phone = #{param1} and id &lt;&gt; #{param2}
+    </select>
+
     <!--设置用户为管理员-->
     <update id="setUser" parameterType="int">
         update graduation.user set usertype = #{param2} where id = #{param1}

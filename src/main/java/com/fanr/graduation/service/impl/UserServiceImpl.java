@@ -25,8 +25,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public int updateUser(User user) {
-        return this.userMapper.updateUser(user);
+    public User updateUser(User user) {
+        int result = this.userMapper.updateUser(user);
+        String id = String.valueOf(user.getId());
+        return this.userMapper.getUser(id);
     }
 
 
@@ -58,6 +60,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public int checkUsername(String username,int id) {
         return this.userMapper.checkUsername(username,id);
+    }
+
+    @Override
+    public int checkPhone(String phone,int id) {
+        return this.userMapper.checkPhone(phone,id);
     }
 
     @Override
