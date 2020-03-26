@@ -26,7 +26,7 @@ public class SmsSample {
         httpArg.append("c=").append(encodeUrlString(testContent, "UTF-8"));
  
         String result = request(httpUrl, httpArg.toString());
-        System.out.println(result);
+//        System.out.println(result);
 
         return result;
     }

@@ -20,10 +20,10 @@ public class User {
     private int file_num;
 
     //空间容量
-    private String volume;
+    private int volume;
 
     //空间使用量
-    private String user_id;
+    private int used;
 
     //用户类型
     private String usertype;
@@ -86,20 +86,20 @@ public class User {
         this.file_num = file_num;
     }
 
-    public String getVolume() {
+    public int getVolume() {
         return volume;
     }
 
-    public void setVolume(String volume) {
+    public void setVolume(int volume) {
         this.volume = volume;
     }
 
-    public String getUserId() {
-        return user_id;
+    public int getUsed() {
+        return used;
     }
 
-    public void setUserId(String userId) {
-        this.user_id = userId;
+    public void setUsed(int used) {
+        this.used = used;
     }
 
     public String getUserType() {
@@ -151,7 +151,7 @@ public class User {
                 ", createTime='" + create_time + '\'' +
                 ", file_num=" + file_num +
                 ", volume='" + volume + '\'' +
-                ", userId='" + user_id + '\'' +
+                ", used='" + used + '\'' +
                 ", userType='" + usertype + '\'' +
                 ", login_time='" + login_time + '\'' +
                 ", phone='" + phone + '\'' +

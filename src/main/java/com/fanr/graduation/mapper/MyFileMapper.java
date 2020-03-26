@@ -15,6 +15,9 @@ public interface MyFileMapper {
     @Select("select count(*) from file where user_id = #{id}")
     int getFileNum(int id);
 
+    @Select("select sum(size) from file where user_id = #{id}")
+    Integer getFileVolume(int id);
+
     //上传单个文件
     int uploadFile(MyFile file);
 
@@ -59,6 +62,9 @@ public interface MyFileMapper {
 
     //分享文件
     int shareFile(int id,String shareCoe);
+
+    //取消分享文件
+    int unShare(int id);
 
     //验证分享码
     int downShareFile(int id,String code);

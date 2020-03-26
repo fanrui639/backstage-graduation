@@ -6,11 +6,15 @@ import com.fanr.graduation.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static com.fanr.graduation.common.Email.sendEmail;
 
 @RestController
 @RequestMapping("/api/user")
@@ -39,7 +43,7 @@ public class UserController {
             user.setLoginTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
             User result = this.userService.updateUser(user);
         }else{
-            return ResultUtil.error(0,"登录失败");
+            return ResultUtil.error(500,"登录失败");
         }
         HttpSession session = request.getSession();
         session.setAttribute("user",user);
@@ -58,7 +62,7 @@ public class UserController {
         user.setEmail(email);
         user.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         user.setUserType("1");
-        user.setVolume("50");
+        user.setVolume(50);
         user.setFileNum(0);
         user.setLoginTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 //        user.setUserId(username);
@@ -86,15 +90,12 @@ public class UserController {
 
     //查询所有
     @GetMapping("/getAll")
-    public Result getAll(Integer limit,Integer page){
-        if (limit == null){
-            limit = 0;
-        }
+    public Result getAll(Integer page){
         if (page == null){
-            page = 10;
+            page = 0;
         }
         int total = this.userService.getTotal();
-        List<User> list = this.userService.getAll(limit,page);
+        List<User> list = this.userService.getAll(page);
         return ResultUtil.success(total,list);
     }
 
@@ -133,7 +134,7 @@ public class UserController {
 
         session.setAttribute("sendMsgCode",code);
 
-        System.out.println("code = " + code);
+//        System.out.println("code = " + code);
 
         String msg = "【639网盘】您的验证码是" + code + ",５分钟内有效。若非本人操作请忽略此消息。";
 
@@ -158,7 +159,8 @@ public class UserController {
         User user = (User) session.getAttribute("user");
 
         if(user != null){
-            return ResultUtil.success(user);
+            User myuser = this.userService.getUser(String.valueOf(user.getId()));
+            return ResultUtil.success(myuser);
         }
         Map map = new HashMap();
         map.put("id",-1);
@@ -272,6 +274,19 @@ public class UserController {
         }else{
             return ResultUtil.error(500,"修改密码失败");
         }
+    }
+
+    //联系客服
+    @GetMapping("/kefu")
+    public Result kefu(String title,String msg,HttpSession session) throws GeneralSecurityException, MessagingException {
+
+        User user = (User)session.getAttribute("user");
+        String account = user.getEmail();
+        account = "2578543184@qq.com";
+
+        sendEmail(title,msg,account);
+
+        return ResultUtil.success();
     }
 
     //根据长度生成随机数

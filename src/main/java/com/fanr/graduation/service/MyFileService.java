@@ -43,6 +43,9 @@ public interface MyFileService {
     //分享文件
     int shareFile(int id,String shareCode);
 
+    //取消分享文件
+    int unShare(int id);
+
     //验证分享码
     int downShareFile(int id,String code);
 

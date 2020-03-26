@@ -170,6 +170,12 @@
         update graduation.file set file_property = 1 , code = #{param2} where id = #{param1}
     </update>
 
+    <!--取消分享文件-->
+    <update id="unShare">
+        update graduation.file set file_property = 0 , code = 0 where id = #{id}
+    </update>
+
+
     <!--验证分享码-->
     <select id="downShareFile" resultType="int">
         select count(*) from graduation.file where id = #{param1} and code = #{param2}

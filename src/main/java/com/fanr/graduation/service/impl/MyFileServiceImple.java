@@ -88,6 +88,12 @@ public class MyFileServiceImple implements MyFileService {
         return this.myFileMapper.shareFile(id,shareCode);
     }
 
+    //取消分享文件
+    @Override
+    public int unShare(int id){
+        return this.myFileMapper.unShare(id);
+    }
+
     @Override
     public int downShareFile(int id, String code) {
         return this.myFileMapper.downShareFile(id,code);

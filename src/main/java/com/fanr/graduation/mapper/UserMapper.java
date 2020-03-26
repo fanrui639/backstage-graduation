@@ -2,6 +2,7 @@ package com.fanr.graduation.mapper;
 
 import com.fanr.graduation.entity.User;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ public interface UserMapper {
     User getUser(String id);
 
     //批量查询用户
-    List<User> getAll(Integer limit,Integer page);
+    List<User> getAll(Integer page);
 
     //获得总数
     int getTotal();
@@ -46,5 +47,8 @@ public interface UserMapper {
 
     //修改密码
     int updatePassword(String username,String password);
+
+    //更改用户文件使用量
+    int updateFile(int num,int used,int id);
 
 }

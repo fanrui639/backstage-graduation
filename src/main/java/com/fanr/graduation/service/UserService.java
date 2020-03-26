@@ -29,7 +29,7 @@ public interface UserService {
     User getUser(String id);
 
     //批量查询用户
-    List<User> getAll(Integer limit,Integer page);
+    List<User> getAll(Integer page);
 
     //获得总数
     int getTotal();
@@ -48,5 +48,8 @@ public interface UserService {
 
     //修改密码
     int updatePassword(String username,String password);
+
+    //更改用户空间使用量
+    int updateFile(int id);
 
 }

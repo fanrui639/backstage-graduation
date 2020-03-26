@@ -1,4 +1,4 @@
-package com.fanr.graduation.common;
+package com.fanr.graduation.common.exception;
  
 import java.awt.BasicStroke;
 import java.awt.Color;

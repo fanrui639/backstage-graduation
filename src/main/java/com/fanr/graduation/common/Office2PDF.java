@@ -49,7 +49,7 @@ public class Office2PDF {
 		//   System.out.println("操作系统名称:"+osName);
 		if (Pattern.matches("Linux.*", osName)) {
 			//return "/opt/openoffice.org3";
-            return "/opt/openoffice4:";
+            return "/opt/openoffice4/program";
 		} else if (Pattern.matches("Windows.*", osName)) {
 //			return "C:/Program Files/OpenOffice 4";
             return "F:\\software\\OpenOffice4";

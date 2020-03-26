@@ -10,8 +10,8 @@
         <result column="email" property="email" jdbcType="VARCHAR"/>
         <result column="create_time" property="create_time" jdbcType="VARCHAR"/>
         <result column="file_num" property="file_num" jdbcType="INTEGER"/>
-        <result column="volume" property="volume" jdbcType="VARCHAR"/>
-        <result column="user_id" property="user_id" jdbcType="VARCHAR"/>
+        <result column="volume" property="volume" jdbcType="INTEGER"/>
+        <result column="used" property="used" jdbcType="INTEGER"/>
         <result column="usertype" property="usertype" jdbcType="VARCHAR"/>
         <result column="login_time" property="login_time" jdbcType="VARCHAR"/>
     </resultMap>
@@ -55,8 +55,8 @@
             <if test="volume != null and volume != ''">
                 volume = #{volume},
             </if>
-            <if test="user_id != null and user_id != ''">
-                user_id = #{user_id},
+            <if test="used != null and used != ''">
+                used = #{used},
             </if>
             <if test="usertype != null and usertype != ''">
                 usertype = #{usertype},
@@ -71,7 +71,7 @@
 
     <!-- 注册 -->
     <insert id="register" parameterType="com.fanr.graduation.entity.User">
-        insert into user(username, password, phone, email, create_time, file_num, volume, user_id, usertype, login_time
+        insert into user(username, password, phone, email, create_time, file_num, volume, used, usertype, login_time
         )
         VALUE
         (
@@ -89,7 +89,7 @@
         ,
         #{volume}
         ,
-        #{user_id}
+        #{used}
         ,
         #{usertype}
         ,
@@ -104,12 +104,12 @@
 
     <!--查询单个用户-->
     <select id="getUser" resultType="com.fanr.graduation.entity.User">
-        select * from user where id = #{id}
+        select * from graduation.user where id = #{id}
     </select>
 
     <!--批量查询用户-->
     <select id="getAll" resultMap="userMap">
-        select * from user limit #{param1},#{param2}
+        select * from user where id > 0 limit #{param1},6
     </select>
 
     <!--获得总数-->
@@ -142,4 +142,8 @@
         update graduation.user set password = #{param2} where username = #{param1}
     </update>
 
+    <!--更改用户文件使用量-->
+    <update id="updateFile">
+        update graduation.user set file_num = #{param1},used = #{param2} where id = #{param3}
+    </update>
 </mapper>

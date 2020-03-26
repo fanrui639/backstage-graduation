@@ -7,6 +7,7 @@ import com.fanr.graduation.entity.ConvertFile;
 import com.fanr.graduation.entity.User;
 import com.fanr.graduation.service.ConvertFileService;
 import com.fanr.graduation.service.MyFileService;
+import com.fanr.graduation.service.UserService;
 import org.jodconverter.office.OfficeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -34,8 +35,11 @@ public class MyFileController {
     @Autowired
     private ConvertFileService convertFileService;
 
-//    private final static String path = "G:/file/";
-    private final static String path = "/home/data/";
+    @Autowired
+    private UserService userService;
+
+    private final static String path = "G:/file/";
+//    private final static String path = "/home/data/";
 
 
     //上传单个文件
@@ -53,6 +57,12 @@ public class MyFileController {
         //判断是否登陆
         if(user == null){
             return ResultUtil.error(500,"请登录后操作");
+        }
+        //判断是否有剩余空间
+        int left = (user.getVolume() - user.getUsed()) * 1024;
+        int fileSize = (int) (file.getSize()/1024);
+        if(left < fileSize){
+            return ResultUtil.error(500,"没有剩余空间了！请清理使用空间");
         }
         String filePath = path + user.getUsername();
         int userId = user.getId();
@@ -75,7 +85,7 @@ public class MyFileController {
             myFile.setFileType(file.getContentType());
             myFile.setPath(filePath);
             myFile.setShareNum(0);
-            myFile.setSize((int) file.getSize());
+            myFile.setSize((int) file.getSize()/1024);
             myFile.setUserId(userId);
             int result = this.MyfileService.uploadFile(myFile);
             if (result > 0){
@@ -194,6 +204,7 @@ public class MyFileController {
         int id = user.getId();
         int total = this.MyfileService.getFileNum(id);
         List<MyFile> list = this.MyfileService.queryFileList(id, page);
+        this.userService.updateFile(id);
 
         return ResultUtil.success(total,list);
     }
@@ -234,7 +245,7 @@ public class MyFileController {
 
                 File targetFile = new File(filepath);
                 delFile(targetFile);
-                if(convertFile != null){
+                if(convertFile.getId() != null){
                     delFile(new File(convertFile.getPath() + convertFile.getFilename()));
                     this.convertFileService.deleteByFileId(id);
                 }
@@ -256,6 +267,15 @@ public class MyFileController {
         }
 
         int result = this.MyfileService.shareFile(id,shareCode);
+
+        return ResultUtil.success();
+    }
+
+    //取消分享文件
+    @GetMapping("/unShare")
+    public Result unShare(Integer id){
+
+        int result = this.MyfileService.unShare(id);
 
         return ResultUtil.success();
     }
@@ -284,8 +304,8 @@ public class MyFileController {
         if(convertfile.getId() == null){
             MyFile file = this.MyfileService.getFileById(id);
 
-            String inFile = file.getPath() + "//" + file.getFileName();
-            String convertpath = path + "convert//";
+            String inFile = file.getPath() + "/" + file.getFileName();
+            String convertpath = path + "convert/";
             String convertname = file.getFileName().substring(0,file.getFileName().indexOf(".") + 1) + "pdf";
             outFile =  convertpath + convertname;
 

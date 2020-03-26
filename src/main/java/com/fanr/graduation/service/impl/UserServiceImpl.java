@@ -1,6 +1,7 @@
 package com.fanr.graduation.service.impl;
 
 import com.fanr.graduation.entity.User;
+import com.fanr.graduation.mapper.MyFileMapper;
 import com.fanr.graduation.mapper.UserMapper;
 import com.fanr.graduation.service.UserService;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,9 @@ public class UserServiceImpl implements UserService {
 
     @Resource
     private UserMapper userMapper;
+
+    @Resource
+    private MyFileMapper myFileMapper;
 
     @Override
     public List<User> queryUserList() {
@@ -48,8 +52,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAll(Integer limit, Integer page) {
-        return this.userMapper.getAll(limit,page);
+    public List<User> getAll(Integer page) {
+        return this.userMapper.getAll(page);
     }
 
     @Override
@@ -80,6 +84,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public int updatePassword(String username, String password) {
         return this.userMapper.updatePassword(username,password);
+    }
+
+    @Override
+    public int updateFile(int id) {
+        int num = this.myFileMapper.getFileNum(id);
+        Integer used = this.myFileMapper.getFileVolume(id);
+        int usedd = used == null ? 0 : used;
+        return this.userMapper.updateFile(num,usedd,id);
     }
 
 
