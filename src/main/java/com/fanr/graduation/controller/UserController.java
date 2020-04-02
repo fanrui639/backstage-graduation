@@ -61,7 +61,7 @@ public class UserController {
         user.setPhone(phone);
         user.setEmail(email);
         user.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-        user.setUserType("1");
+        user.setUserType("0");
         user.setVolume(50);
         user.setFileNum(0);
         user.setLoginTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
@@ -151,20 +151,26 @@ public class UserController {
 
     }
 
-    //页面初始化
+    //页面初始化   根据id获取用户信息
     @GetMapping("/init")
-    public Result init(HttpServletRequest request){
-        HttpSession session = request.getSession();
+    public Result init(String id,HttpSession session){
 
-        User user = (User) session.getAttribute("user");
+        Map map = new HashMap();
 
-        if(user != null){
-            User myuser = this.userService.getUser(String.valueOf(user.getId()));
+        if(id == null || id.equals("")){
+            User user = (User) session.getAttribute("user");
+
+            if(user != null){
+                User myuser = this.userService.getUser(String.valueOf(user.getId()));
+                return ResultUtil.success(myuser);
+            }
+
+            map.put("id",-1);
+            return ResultUtil.success(map);
+        }else{
+            User myuser = this.userService.getUser(id);
             return ResultUtil.success(myuser);
         }
-        Map map = new HashMap();
-        map.put("id",-1);
-        return ResultUtil.success(map);
     }
 
     //退出登录

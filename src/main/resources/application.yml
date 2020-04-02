@@ -2,7 +2,7 @@ server:
   port: 8889
   servlet:
     session:
-      timeout: 86400s
+      timeout: 72000
 
 spring:
   #数据库配置

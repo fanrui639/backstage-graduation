@@ -324,6 +324,7 @@ public class MyFileController {
                 }
             } catch (OfficeException e) {
                 e.printStackTrace();
+                return null;
             }
         }else{
             outFile = convertfile.getPath() + convertfile.getFilename();
