@@ -1,7 +1,7 @@
 package com.fanr.graduation.service.impl;
 
 import com.fanr.graduation.entity.ConvertFile;
-import com.fanr.graduation.mapper.ConvertFileDao;
+import com.fanr.graduation.mapper.ConvertFileMapper;
 import com.fanr.graduation.service.ConvertFileService;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +17,7 @@ import javax.annotation.Resource;
 @Service("convertFileService")
 public class ConvertFileServiceImpl implements ConvertFileService {
     @Resource
-    private ConvertFileDao convertFileDao;
+    private ConvertFileMapper convertFileDao;
 
     /**
      * 通过ID查询单条数据

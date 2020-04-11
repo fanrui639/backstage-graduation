@@ -3,6 +3,7 @@ package com.fanr.graduation.mapper;
 import com.fanr.graduation.entity.ConvertFile;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
@@ -15,7 +16,8 @@ import java.util.Map;
  * @since 2020-03-16 14:30:49
  */
 @Mapper
-public interface ConvertFileDao {
+@Repository
+public interface ConvertFileMapper {
 
     /**
      * 通过ID查询单条数据
