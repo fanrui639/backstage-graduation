@@ -64,13 +64,13 @@ public class Email{
         message.setFrom(new InternetAddress(username));
 
         //指明邮件的收件人，现在发件人和收件人是一样的，那就是自己给自己发     收件人
-        message.setRecipient(Message.RecipientType.TO, new InternetAddress(username));
+        message.setRecipient(Message.RecipientType.TO, new InternetAddress(account));
 
         //邮件的标题
         message.setSubject(title);
 
         //邮件的文本内容
-        message.setContent(msg + "\n来自用户:" + account, "text/html;charset=UTF-8");
+        message.setContent(msg, "text/html;charset=UTF-8");
 
         //5、发送邮件
         ts.sendMessage(message, message.getAllRecipients());

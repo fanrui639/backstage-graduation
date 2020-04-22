@@ -49,4 +49,7 @@ public interface MyFileService {
     //验证分享码
     int downShareFile(int id,String code);
 
+    //根据用户名和文件名来查找文件信息
+    MyFile getFile(int id,String file);
+
 }

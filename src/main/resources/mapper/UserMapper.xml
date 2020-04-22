@@ -107,6 +107,12 @@
         select * from graduation.user where id = #{id}
     </select>
 
+    <!--根据username查询单个用户-->
+    <select id="getUserByName" resultType="com.fanr.graduation.entity.User">
+        select * from graduation.user where username = #{name}
+    </select>
+
+
     <!--批量查询用户-->
     <select id="getAll" resultMap="userMap">
         select * from user where id > 0 limit #{param1},6

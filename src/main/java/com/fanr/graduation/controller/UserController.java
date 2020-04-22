@@ -1,7 +1,9 @@
 package com.fanr.graduation.controller;
 
 import com.fanr.graduation.common.*;
+import com.fanr.graduation.entity.Approval;
 import com.fanr.graduation.entity.User;
+import com.fanr.graduation.service.ApprovalService;
 import com.fanr.graduation.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +24,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ApprovalService approvalService;
 
     //登录
     @PostMapping("/login")
@@ -287,12 +292,28 @@ public class UserController {
     public Result kefu(String title,String msg,HttpSession session) throws GeneralSecurityException, MessagingException {
 
         User user = (User)session.getAttribute("user");
-        String account = user.getEmail();
-        account = "2578543184@qq.com";
+        System.out.println("title = " + title);
 
-        sendEmail(title,msg,account);
+        if(title.equals("用户注销账号") || title == "用户注销账号"){
 
-        return ResultUtil.success();
+            Approval approval = new Approval();
+            approval.setUser(user.getUsername());
+            approval.setStatus(1);
+            approval.setEvent(user.getUsername());
+            approval.setTime(new Date());
+            approval.setType(1);
+            Approval num = this.approvalService.insert(approval);
+
+            return ResultUtil.success();
+        }else{
+
+            String account = user.getEmail();
+            account = "2578543184@qq.com";
+
+            sendEmail(title,msg + "\n来自用户:" + account,account);
+
+            return ResultUtil.success();
+        }
     }
 
     //根据长度生成随机数

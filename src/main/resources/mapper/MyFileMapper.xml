@@ -131,7 +131,7 @@
 
     <!--显示用户所有文件-->
     <select id="queryFileList" parameterType="int" resultMap="fileMap">
-        select * from graduation.file where user_id = #{0} limit #{1},6
+        select * from graduation.file where user_id = #{param1} limit #{param2},6
     </select>
 
     <!--上传单个文件-->
@@ -179,6 +179,11 @@
     <!--验证分享码-->
     <select id="downShareFile" resultType="int">
         select count(*) from graduation.file where id = #{param1} and code = #{param2}
+    </select>
+
+    <!--  根据用户名和文件名来查找文件  -->
+    <select id="getFile" resultType="com.fanr.graduation.entity.MyFile">
+        select * from graduation.file where user_id = #{param1} and filename = #{param2}
     </select>
 
 </mapper>

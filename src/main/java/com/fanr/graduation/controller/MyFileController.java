@@ -3,8 +3,10 @@ package com.fanr.graduation.controller;
 import com.fanr.graduation.common.Result;
 import com.fanr.graduation.common.ResultUtil;
 import com.fanr.graduation.common.UpAndDownFile;
+import com.fanr.graduation.entity.Approval;
 import com.fanr.graduation.entity.ConvertFile;
 import com.fanr.graduation.entity.User;
+import com.fanr.graduation.service.ApprovalService;
 import com.fanr.graduation.service.ConvertFileService;
 import com.fanr.graduation.service.MyFileService;
 import com.fanr.graduation.service.UserService;
@@ -13,11 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +41,9 @@ public class MyFileController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ApprovalService approvalService;
 
     private final static String path = "G:/file/";
 //    private final static String path = "/home/data/";
@@ -260,15 +267,24 @@ public class MyFileController {
 
     //分享文件
     @GetMapping("/shareFile")
-    public Result shareFile(Integer id,String shareCode){
+    public Result shareFile(Integer id,String shareCode,HttpSession session){
 
-        if(shareCode.equals("") || shareCode.equals(null)){
-            shareCode = "0";
+        MyFile myFile = this.MyfileService.getFileById(id);
+        User user = (User)session.getAttribute("user");
+
+        if(shareCode.equals("") || shareCode.equals(null)){   //如果没有分享码，那通过审批才能被看到
+            Approval approval = new Approval();
+            approval.setUser(user.getUsername());
+            approval.setStatus(1);
+            approval.setEvent(myFile.getFileName());
+            approval.setTime(new Date());
+            approval.setType(2);
+            this.approvalService.insert(approval);
+            return ResultUtil.error(403,"等待审批！！！");
+        }else{
+            int result = this.MyfileService.shareFile(id,shareCode);
+            return ResultUtil.success();
         }
-
-        int result = this.MyfileService.shareFile(id,shareCode);
-
-        return ResultUtil.success();
     }
 
     //取消分享文件
@@ -346,6 +362,32 @@ public class MyFileController {
         out.close();
         return null;
     }
+
+    //测试播放视频
+    @GetMapping("/video")
+    public void getVideo(Integer id,HttpServletResponse response){
+        MyFile MyFile = this.MyfileService.getFileById(id);
+        String filePath = MyFile.getPath() + "/" + MyFile.getFileName();
+
+        File file = new File(filePath);
+        ServletOutputStream out = null;
+        try{
+            FileInputStream inStream = new FileInputStream(file);
+            byte[] b = new byte[1024];
+            int length = 0;
+            BufferedInputStream bis = new BufferedInputStream(inStream);
+            out = response.getOutputStream();
+            BufferedOutputStream bos = new BufferedOutputStream(out);
+            while((length=bis.read(b)) != -1){
+                bos.write(b,0,b.length);
+            }
+
+        }catch(Exception e){
+            //TOOD Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
 
     //删除本地文件
     public static void delFile(File f)

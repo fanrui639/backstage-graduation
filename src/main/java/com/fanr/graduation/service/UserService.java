@@ -25,8 +25,11 @@ public interface UserService {
     //删除注销账号
     int deleteUser(String id);
 
-    //查询单个用户
+    //根据id查询单个用户
     User getUser(String id);
+
+    //根据用户名查询单个用户
+    User getUserByName(String name);
 
     //批量查询用户
     List<User> getAll(Integer page);

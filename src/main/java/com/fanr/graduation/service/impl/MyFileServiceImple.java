@@ -99,4 +99,9 @@ public class MyFileServiceImple implements MyFileService {
         return this.myFileMapper.downShareFile(id,code);
     }
 
+    @Override
+    public MyFile getFile(int id, String file) {
+        return this.myFileMapper.getFile(id,file);
+    }
+
 }
