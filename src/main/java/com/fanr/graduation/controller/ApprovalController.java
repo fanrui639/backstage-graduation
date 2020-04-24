@@ -88,16 +88,17 @@ public class ApprovalController {
     @ApiOperation(value = "根据id 删除数据", notes = "根据id 删除数据", response = Result.class)
     @ApiImplicitParam(name = "id", value = "主键id", required = true, dataType = "Integer")
     @GetMapping("/remove")
-    public Result remove(Integer id, String user, HttpSession session) throws GeneralSecurityException, MessagingException {
-        System.out.println("id = " + id);
-        System.out.println("user = " + user);
+    public Result remove(Integer id, String user, HttpSession session){
         boolean b = this.approvalService.deleteById(id);
-        System.out.println("b = " + b);
         if(b){
             User apUser = this.userService.getUserByName(user);    //获取申请人信息
             User opUser = (User)session.getAttribute("user");    //获取操作人信息
+            try{
+                sendEmail("申请进度通知:","您的申请已被驳回,管理员：" + opUser.getUsername(),apUser.getEmail());
+            }catch (Exception e){
 
-            sendEmail("申请进度通知","您的申请已被驳回,管理员：" + opUser.getUsername(),apUser.getEmail());
+                e.printStackTrace();
+            }
 
         }else{
             return ResultUtil.error(500,"操作失败");
@@ -150,10 +151,6 @@ public class ApprovalController {
      */
     @GetMapping("/passFile")
     public Result passFile(Integer id,String user,String file){
-
-        System.out.println("id = " + id);
-        System.out.println("user = " + user);
-        System.out.println("file = " + file);
 
         User myUser = this.userService.getUserByName(user);
         MyFile opFile = this.myFileService.getFile(myUser.getId(),file);

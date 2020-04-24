@@ -12,6 +12,7 @@ import com.fanr.graduation.service.MyFileService;
 import com.fanr.graduation.service.UserService;
 import org.jodconverter.office.OfficeException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -66,7 +67,7 @@ public class MyFileController {
             return ResultUtil.error(500,"请登录后操作");
         }
         //判断是否有剩余空间
-        int left = (user.getVolume() - user.getUsed()) * 1024;
+        int left = (user.getVolume() * 1024 - user.getUsed());
         int fileSize = (int) (file.getSize()/1024);
         if(left < fileSize){
             return ResultUtil.error(500,"没有剩余空间了！请清理使用空间");
