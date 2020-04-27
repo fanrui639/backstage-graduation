@@ -2,12 +2,15 @@ package com.fanr.graduation.controller;
 
 import com.fanr.graduation.common.*;
 import com.fanr.graduation.entity.Approval;
+import com.fanr.graduation.entity.Operation;
 import com.fanr.graduation.entity.User;
 import com.fanr.graduation.service.ApprovalService;
+import com.fanr.graduation.service.OperationService;
 import com.fanr.graduation.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,6 +30,9 @@ public class UserController {
 
     @Autowired
     private ApprovalService approvalService;
+
+    @Resource
+    private OperationService operationService;
 
     //登录
     @PostMapping("/login")
@@ -53,12 +59,22 @@ public class UserController {
         HttpSession session = request.getSession();
         session.setAttribute("user",user);
 
+        String ip = CusAccessObjectUtil.getIp2(request);
+        Operation operation = new Operation();
+        operation.setOperator(user.getUsername());
+        operation.setEvent("用户 " + user.getUsername() + " 登录 ");
+        operation.setTime(new Date());
+        operation.setOperrationIp(ip);
+        operation.setType("user");
+//        System.out.println("operation = " + operation);
+        Operation insert = this.operationService.insert(operation);
+
         return ResultUtil.success(user);
     }
 
     //注册
     @PostMapping("/register")
-    public Result register(String username,String password,String phone,String email,String verifyCode,HttpSession session){
+    public Result register(String username,String password,String phone,String email,String verifyCode,HttpSession session, HttpServletRequest request){
 
         User user = new User();
         user.setUsername(username);
@@ -82,6 +98,16 @@ public class UserController {
 //                System.out.println("开始存入数据库");
                 int result = this.userService.register(user);
                 if(result > 0){
+
+                    String ip = CusAccessObjectUtil.getIp2(request);
+                    Operation operation = new Operation();
+                    operation.setOperator(user.getUsername());
+                    operation.setEvent("用户 " + user.getUsername() + " 注册成功 ");
+                    operation.setTime(new Date());
+                    operation.setOperrationIp(ip);
+                    operation.setType("user");
+                    Operation insert = this.operationService.insert(operation);
+
                     return ResultUtil.success();
                 }else{
                     return ResultUtil.error(500,"服务出错！！");
@@ -120,13 +146,22 @@ public class UserController {
 
     //修改用户信息
     @PostMapping("/updateUser")
-    public Result updateUser(User user,HttpSession session){
+    public Result updateUser(User user,HttpSession session, HttpServletRequest request){
 
-        System.out.println("user = " + user);
+//        System.out.println("user = " + user);
 
         User myuser = this.userService.updateUser(user);
 
         session.setAttribute("user",myuser);
+
+        String ip = CusAccessObjectUtil.getIp2(request);
+        Operation operation = new Operation();
+        operation.setOperator(user.getUsername());
+        operation.setEvent("用户 " + user.getUsername() + " 修改信息 ");
+        operation.setTime(new Date());
+        operation.setOperrationIp(ip);
+        operation.setType("user");
+        Operation insert = this.operationService.insert(operation);
 
         return ResultUtil.success();
     }
@@ -182,6 +217,17 @@ public class UserController {
     @GetMapping("/loginOut")
     public Result loginOut(HttpServletRequest request){
         HttpSession session = request.getSession();
+
+        User user = (User)session.getAttribute("user");
+        String ip = CusAccessObjectUtil.getIp2(request);
+        Operation operation = new Operation();
+        operation.setOperator(user.getUsername());
+        operation.setEvent("用户 " + user.getUsername() + " 退出登录 ");
+        operation.setTime(new Date());
+        operation.setOperrationIp(ip);
+        operation.setType("user");
+        Operation insert = this.operationService.insert(operation);
+
         session.removeAttribute("user");
         return ResultUtil.success();
     }
@@ -231,7 +277,21 @@ public class UserController {
 
     //设置用户为管理员
     @GetMapping("/setUser")
-    public Result setUser(Integer id,Integer type){
+    public Result setUser(Integer id,Integer type, HttpSession session,HttpServletRequest request){
+
+        User opUser = (User)session.getAttribute("user");
+
+        User user = this.userService.getUser(String.valueOf(id));
+
+        String ip = CusAccessObjectUtil.getIp2(request);
+        Operation operation = new Operation();
+        operation.setOperator(opUser.getUsername());
+        String event = type == 1 ? "给用户设置成管理员":"取消用户管理员权限";
+        operation.setEvent(user.getUsername() + event);
+        operation.setTime(new Date());
+        operation.setOperrationIp(ip);
+        operation.setType("user");
+        Operation insert = this.operationService.insert(operation);
 
         int result = this.userService.setUser(id,type);
 
@@ -277,10 +337,24 @@ public class UserController {
 
     //修改密码
     @PostMapping("/updatePassword")
-    public Result updatePassword(String username,String password){
+    public Result updatePassword(String username,String password,HttpServletRequest request,HttpSession session){
+
+        User user = (User)session.getAttribute("user");
+
         String mypwd = MD5Util.getMd5(password);
         int result = this.userService.updatePassword(username,mypwd);
         if(result > 0){
+
+            String ip = CusAccessObjectUtil.getIp2(request);
+            Operation operation = new Operation();
+            operation.setOperator(user.getUsername());
+            operation.setEvent(" 用户 " + user.getUsername() + " 修改了密码 ");
+            operation.setTime(new Date());
+            operation.setOperrationIp(ip);
+            operation.setType("user");
+            Operation insert = this.operationService.insert(operation);
+
+
             return ResultUtil.success();
         }else{
             return ResultUtil.error(500,"修改密码失败");
@@ -289,10 +363,20 @@ public class UserController {
 
     //联系客服
     @GetMapping("/kefu")
-    public Result kefu(String title,String msg,HttpSession session) throws GeneralSecurityException, MessagingException {
+    public Result kefu(String title,String msg,HttpSession session, HttpServletRequest request) throws GeneralSecurityException, MessagingException {
 
         User user = (User)session.getAttribute("user");
-        System.out.println("title = " + title);
+//        System.out.println("title = " + title);
+
+        String ip = CusAccessObjectUtil.getIp2(request);
+        Operation operation = new Operation();
+        operation.setOperator(user.getUsername());
+        operation.setEvent(" 用户 " + user.getUsername() + " 联系了客服 ");
+        operation.setTime(new Date());
+        operation.setOperrationIp(ip);
+        operation.setType("user");
+        operation.setRemarks(title + ":" + msg);
+        Operation insert = this.operationService.insert(operation);
 
         if(title.equals("用户注销账号") || title == "用户注销账号"){
 

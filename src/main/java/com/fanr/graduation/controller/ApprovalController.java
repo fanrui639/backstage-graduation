@@ -1,12 +1,15 @@
 package com.fanr.graduation.controller;
 
+import com.fanr.graduation.common.CusAccessObjectUtil;
 import com.fanr.graduation.common.Result;
 import com.fanr.graduation.common.ResultUtil;
 import com.fanr.graduation.entity.Approval;
 import com.fanr.graduation.entity.MyFile;
+import com.fanr.graduation.entity.Operation;
 import com.fanr.graduation.entity.User;
 import com.fanr.graduation.service.ApprovalService;
 import com.fanr.graduation.service.MyFileService;
+import com.fanr.graduation.service.OperationService;
 import com.fanr.graduation.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -14,11 +17,10 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.security.GeneralSecurityException;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import static com.fanr.graduation.common.Email.sendEmail;
 
@@ -43,6 +45,10 @@ public class ApprovalController {
 
     @Resource
     private MyFileService myFileService;
+
+    @Resource
+    private OperationService operationService;
+
 
     /**
      * 通过主键查询单条数据
@@ -88,18 +94,27 @@ public class ApprovalController {
     @ApiOperation(value = "根据id 删除数据", notes = "根据id 删除数据", response = Result.class)
     @ApiImplicitParam(name = "id", value = "主键id", required = true, dataType = "Integer")
     @GetMapping("/remove")
-    public Result remove(Integer id, String user, HttpSession session){
+    public Result remove(Integer id, String user, HttpSession session, HttpServletRequest request){
         boolean b = this.approvalService.deleteById(id);
         if(b){
             User apUser = this.userService.getUserByName(user);    //获取申请人信息
             User opUser = (User)session.getAttribute("user");    //获取操作人信息
+
+            String ip = CusAccessObjectUtil.getIp2(request);
+            Operation operation = new Operation();
+            operation.setOperator(opUser.getUsername());
+            operation.setEvent("删除用户 " + user + " 的申请!");
+            operation.setTime(new Date());
+            operation.setOperrationIp(ip);
+            operation.setType("approval");
             try{
                 sendEmail("申请进度通知:","您的申请已被驳回,管理员：" + opUser.getUsername(),apUser.getEmail());
+                operation.setRemarks("已发送邮件通知");
             }catch (Exception e){
-
                 e.printStackTrace();
+                operation.setRemarks("通知邮件发送失败");
             }
-
+            Operation insert = this.operationService.insert(operation);
         }else{
             return ResultUtil.error(500,"操作失败");
         }
@@ -134,7 +149,7 @@ public class ApprovalController {
      * 删除用户申请
      */
     @GetMapping("/deleteUser")
-    public Result deleteUser(Integer id,String user){
+    public Result deleteUser(Integer id,String user, HttpServletRequest request){
         User opUser = this.userService.getUserByName(user);
         int num = this.userService.deleteUser(String.valueOf(opUser.getId()));
         if(num > 0){
@@ -142,6 +157,16 @@ public class ApprovalController {
             approval.setId(id);
             approval.setStatus(0);
             this.approvalService.update(approval);
+
+            String ip = CusAccessObjectUtil.getIp2(request);
+            Operation operation = new Operation();
+            operation.setOperator(opUser.getUsername());
+            operation.setEvent("注销用户：" + user);
+            operation.setTime(new Date());
+            operation.setOperrationIp(ip);
+            operation.setType("approval");
+            Operation insert = this.operationService.insert(operation);
+
         }
         return ResultUtil.success();
     }
@@ -150,10 +175,12 @@ public class ApprovalController {
      * 通过无分享码文件
      */
     @GetMapping("/passFile")
-    public Result passFile(Integer id,String user,String file){
+    public Result passFile(Integer id,String user,String file, HttpSession session, HttpServletRequest request){
 
         User myUser = this.userService.getUserByName(user);
         MyFile opFile = this.myFileService.getFile(myUser.getId(),file);
+
+        User opUser = (User)session.getAttribute("user");    //获取操作人信息
 
         opFile.setFileProperty(1);
         int num = this.myFileService.shareFile(opFile.getId(),"0");
@@ -163,8 +190,31 @@ public class ApprovalController {
             approval.setId(id);
             approval.setStatus(0);
             this.approvalService.update(approval);
+
+            String ip = CusAccessObjectUtil.getIp2(request);
+            Operation operation = new Operation();
+            operation.setOperator(opUser.getUsername());
+            operation.setEvent("通过用户 " + user + " 的文件 " + file + " 无分享码分享");
+            operation.setTime(new Date());
+            operation.setOperrationIp(ip);
+            operation.setType("approval");
+            Operation insert = this.operationService.insert(operation);
         }
 
+        return ResultUtil.success();
+    }
+
+
+    /**
+     * 查看审批事件详情
+     */
+    @GetMapping("/showEvent")
+    public Result showEvent(HttpServletRequest request){
+        System.out.println(CusAccessObjectUtil.getIp2(request));
+        String requestUrlIP = request.getServerName();
+        String userIpAddr = request.getRemoteAddr();
+        System.out.println("***访问的Url中的服务器IP："+requestUrlIP);
+        System.out.println("***用户客户端的IP地址："+userIpAddr);
         return ResultUtil.success();
     }
 

@@ -1,21 +1,18 @@
 package com.fanr.graduation.controller;
 
+import com.fanr.graduation.common.CusAccessObjectUtil;
 import com.fanr.graduation.common.Result;
 import com.fanr.graduation.common.ResultUtil;
 import com.fanr.graduation.common.UpAndDownFile;
-import com.fanr.graduation.entity.Approval;
-import com.fanr.graduation.entity.ConvertFile;
-import com.fanr.graduation.entity.User;
-import com.fanr.graduation.service.ApprovalService;
-import com.fanr.graduation.service.ConvertFileService;
-import com.fanr.graduation.service.MyFileService;
-import com.fanr.graduation.service.UserService;
+import com.fanr.graduation.entity.*;
+import com.fanr.graduation.service.*;
 import org.jodconverter.office.OfficeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,7 +23,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import com.fanr.graduation.entity.MyFile;
 
 import static com.fanr.graduation.common.Office2PDF.office2pdf;
 
@@ -45,6 +41,9 @@ public class MyFileController {
 
     @Autowired
     private ApprovalService approvalService;
+
+    @Resource
+    private OperationService operationService;
 
     private final static String path = "G:/file/";
 //    private final static String path = "/home/data/";
@@ -103,6 +102,14 @@ public class MyFileController {
             e.printStackTrace();
         }
 
+        String ip = CusAccessObjectUtil.getIp2(request);
+        Operation operation = new Operation();
+        operation.setOperator(user.getUsername());
+        operation.setEvent("用户 " + user + " 上传文件 " + file.getOriginalFilename());
+        operation.setTime(new Date());
+        operation.setOperrationIp(ip);
+        operation.setType("file");
+        Operation insert = this.operationService.insert(operation);
 
         return ResultUtil.success(upload);
     }
@@ -135,10 +142,13 @@ public class MyFileController {
 
     //下载单个文件
     @GetMapping("/downloadFile/{fileId}")
-    public Result downloadFile(HttpServletRequest request, HttpServletResponse response,@PathVariable String fileId) throws IOException {
+    public Result downloadFile(HttpSession session, HttpServletRequest request, HttpServletResponse response,@PathVariable String fileId) throws IOException {
         //得到要下载的文件名
 //        String fileName = URLDecoder.decode(request.getParameter("diarycontent"), "utf-8");
+//
 //        String fileName = filename;
+        User user = (User)session.getAttribute("user");
+
         MyFile myFile = this.MyfileService.queryById(fileId);
 
         String fileName = myFile.getFileName();
@@ -181,6 +191,15 @@ public class MyFileController {
         in.close();
         //关闭输出流
         out.close();
+
+        String ip = CusAccessObjectUtil.getIp2(request);
+        Operation operation = new Operation();
+        operation.setOperator(user.getUsername());
+        operation.setEvent("用户 " + user + " 下载文件 " + myFile.getFileName());
+        operation.setTime(new Date());
+        operation.setOperrationIp(ip);
+        operation.setType("file");
+        Operation insert = this.operationService.insert(operation);
 
         return ResultUtil.success();
     }
@@ -241,7 +260,10 @@ public class MyFileController {
 
     //删除文件
     @GetMapping("/deleteFile")
-    public Result deleteFile(Integer id){
+    public Result deleteFile(Integer id, HttpSession session, HttpServletRequest request){
+
+        User user = (User)session.getAttribute("user");
+
         if(id != null) {
             MyFile myFile = this.MyfileService.getFileById(id);   //查找文件
             ConvertFile convertFile = this.convertFileService.queryByFileId(id);    //查找是否被转换过
@@ -259,6 +281,16 @@ public class MyFileController {
                 }
             }
 
+            String ip = CusAccessObjectUtil.getIp2(request);
+            Operation operation = new Operation();
+            operation.setOperator(user.getUsername());
+            operation.setEvent("用户 " + user + " 删除文件 " + myFile.getFileName());
+            operation.setTime(new Date());
+            operation.setOperrationIp(ip);
+            operation.setType("file");
+            Operation insert = this.operationService.insert(operation);
+
+
             return ResultUtil.success();
         }else{
             return ResultUtil.error(500,"请检查您的传值");
@@ -268,7 +300,7 @@ public class MyFileController {
 
     //分享文件
     @GetMapping("/shareFile")
-    public Result shareFile(Integer id,String shareCode,HttpSession session){
+    public Result shareFile(Integer id,String shareCode,HttpSession session, HttpServletRequest request){
 
         MyFile myFile = this.MyfileService.getFileById(id);
         User user = (User)session.getAttribute("user");
@@ -284,15 +316,37 @@ public class MyFileController {
             return ResultUtil.error(403,"等待审批！！！");
         }else{
             int result = this.MyfileService.shareFile(id,shareCode);
+
+            String ip = CusAccessObjectUtil.getIp2(request);
+            Operation operation = new Operation();
+            operation.setOperator(user.getUsername());
+            operation.setEvent("用户 " + user + " 分享文件 " + myFile.getFileName());
+            operation.setTime(new Date());
+            operation.setOperrationIp(ip);
+            operation.setRemarks("分享码: " + shareCode);
+            operation.setType("file");
+            Operation insert = this.operationService.insert(operation);
+
             return ResultUtil.success();
         }
     }
 
     //取消分享文件
     @GetMapping("/unShare")
-    public Result unShare(Integer id){
+    public Result unShare(Integer id, HttpSession session, HttpServletRequest request){
 
         int result = this.MyfileService.unShare(id);
+        User user = (User)session.getAttribute("user");
+        MyFile myFile = this.MyfileService.getFileById(id);
+
+        String ip = CusAccessObjectUtil.getIp2(request);
+        Operation operation = new Operation();
+        operation.setOperator(user.getUsername());
+        operation.setEvent("用户 " + user + " 取消分享文件 " + myFile.getFileName());
+        operation.setTime(new Date());
+        operation.setOperrationIp(ip);
+        operation.setType("file");
+        Operation insert = this.operationService.insert(operation);
 
         return ResultUtil.success();
     }
@@ -312,7 +366,7 @@ public class MyFileController {
 
     //预览文件
     @GetMapping("/seeFile")
-    public String seeFile(Integer id, HttpServletResponse response) throws IOException {
+    public String seeFile(Integer id, HttpServletResponse response,HttpSession session, HttpServletRequest request) throws IOException {
 
         String outFile = "";
 
@@ -361,6 +415,19 @@ public class MyFileController {
             out.write(buf, 0, len);
         br.close();
         out.close();
+
+
+        User user = (User)session.getAttribute("user");
+        MyFile myFile = this.MyfileService.getFileById(id);
+        String ip = CusAccessObjectUtil.getIp2(request);
+        Operation operation = new Operation();
+        operation.setOperator(user.getUsername());
+        operation.setEvent("用户 " + user + " 预览文件 " + myFile.getFileName());
+        operation.setTime(new Date());
+        operation.setOperrationIp(ip);
+        operation.setType("file");
+        Operation insert = this.operationService.insert(operation);
+
         return null;
     }
 

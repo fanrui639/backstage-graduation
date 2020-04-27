@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fanr.graduation.mapper.OperationDao">
+
+    <resultMap type="com.fanr.graduation.entity.Operation" id="OperationMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="operator" column="operator" jdbcType="VARCHAR"/>
+        <result property="event" column="event" jdbcType="VARCHAR"/>
+        <result property="time" column="time" jdbcType="TIMESTAMP"/>
+        <result property="operrationIp" column="operration_ip" jdbcType="VARCHAR"/>
+        <result property="type" column="type" jdbcType="VARCHAR"/>
+        <result property="remarks" column="remarks" jdbcType="VARCHAR"/>
+    </resultMap>
+    
+     <!--定义所有字段 sql 片段-->
+    <sql id="Base_Column_List">
+        id, operator, event, time, operration_ip, type, remarks        
+    </sql>
+    
+     <!--定义动态查询 sql 片段-->
+    <sql id="BaseWhere">
+        <where>
+                <if test="operator != null and operator != ''">
+                and operator LIKE CONCAT('%',#{operator},'%')
+            </if>
+                <if test="event != null and event != ''">
+                and event LIKE CONCAT('%',#{event},'%')
+            </if>
+                <if test="time != null">
+                and time = #{time}
+            </if>
+                <if test="operrationIp != null and operrationIp != ''">
+                and operration_ip LIKE CONCAT('%',#{operrationIp},'%')
+            </if>
+                <if test="type != null and type != ''">
+                and type LIKE CONCAT('%',#{type},'%')
+            </if>
+                <if test="remarks != null and remarks != ''">
+                and remarks LIKE CONCAT('%',#{remarks},'%')
+            </if>
+        </where>
+    </sql>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="OperationMap">
+        select
+        <include refid="Base_Column_List"/>
+        from graduation.operation
+        where id = #{id}
+    </select>
+    
+     <!--查询数据总有条数-->
+    <select id="count" resultType="long">
+        select count(*) from graduation.operation
+    </select>
+
+    <!--分页查询所有-->
+    <select id="queryAllByLimit" resultMap="OperationMap">
+        select
+            <include refid="Base_Column_List"/>
+        from graduation.operation limit #{page}, 10
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="OperationMap">
+        select
+            <include refid="Base_Column_List"/>
+        from graduation.operation
+            <include refid="BaseWhere"/>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.fanr.graduation.entity.Operation">
+        insert into graduation.operation(id, operator, event, time, operration_ip, type, remarks)
+        values (#{id}, #{operator}, #{event}, #{time}, #{operrationIp}, #{type}, #{remarks})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update graduation.operation
+        <set>
+            <if test="operator != null and operator != ''">
+                operator = #{operator},
+            </if>
+            <if test="event != null and event != ''">
+                event = #{event},
+            </if>
+            <if test="time != null">
+                time = #{time},
+            </if>
+            <if test="operrationIp != null and operrationIp != ''">
+                operration_ip = #{operrationIp},
+            </if>
+            <if test="type != null and type != ''">
+                type = #{type},
+            </if>
+            <if test="remarks != null and remarks != ''">
+                remarks = #{remarks},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from graduation.operation where id = #{id}
+    </delete>
+
+
+    <!-- 条件查询-->
+    <select id="search" parameterType="map" resultMap="OperationMap">
+        select * from graduation.operation
+        <where>
+            <if test="operator != null and operator != ''">
+                and operator LIKE CONCAT('%',#{operator},'%')
+            </if>
+            <if test="event != null and event != ''">
+                and event LIKE CONCAT('%',#{event},'%')
+            </if>
+            <if test="operrationIp != null and operrationIp != ''">
+                and operration_ip LIKE CONCAT('%',#{operrationIp},'%')
+            </if>
+            <if test="beginTime != null and beginTime != ''">
+                and time &gt;= #{beginTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and time &lt;= #{endTime}
+            </if>
+        </where>
+        limit #{page},10
+    </select>
+
+    <select id="countSearch" resultType="long">
+        select count(*) from graduation.operation
+        <where>
+            <if test="operator != null and operator != ''">
+                and operator LIKE CONCAT('%',#{operator},'%')
+            </if>
+            <if test="event != null and event != ''">
+                and event LIKE CONCAT('%',#{event},'%')
+            </if>
+            <if test="operrationIp != null and operrationIp != ''">
+                and operration_ip LIKE CONCAT('%',#{operrationIp},'%')
+            </if>
+            <if test="beginTime != null and beginTime != ''">
+                and time &gt; #{beginTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and time &lt; #{endTime}
+            </if>
+        </where>
+    </select>
+
+</mapper>
