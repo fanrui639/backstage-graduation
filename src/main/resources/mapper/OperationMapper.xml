@@ -58,7 +58,7 @@
     <select id="queryAllByLimit" resultMap="OperationMap">
         select
             <include refid="Base_Column_List"/>
-        from graduation.operation limit #{page}, 10
+        from graduation.operation ORDER BY time desc limit #{page}, 10
     </select>
 
     <!--通过实体作为筛选条件查询-->
@@ -127,7 +127,7 @@
                 and time &lt;= #{endTime}
             </if>
         </where>
-        limit #{page},10
+        ORDER BY time desc limit #{page},10
     </select>
 
     <select id="countSearch" resultType="long">
@@ -149,6 +149,7 @@
                 and time &lt; #{endTime}
             </if>
         </where>
+        ORDER BY time desc
     </select>
 
 </mapper>
