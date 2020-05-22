@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,6 +120,12 @@ public class OperationController {
         map.put("operator",operator);
         map.put("event",event);
         map.put("operrationIp",operrationIp);
+        if(beginTime.equals(null) || beginTime.equals("")){
+            beginTime = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        }
+        if(endTime.equals(null) || endTime.equals("")){
+            endTime = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        }
         map.put("beginTime",beginTime + " 00:00:00");
         map.put("endTime",endTime + " 23:59:59");
         map.put("page",page);

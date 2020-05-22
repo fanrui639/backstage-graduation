@@ -109,7 +109,7 @@
 
     <!-- 条件查询-->
     <select id="search" parameterType="map" resultMap="OperationMap">
-        select * from graduation.operation
+        select * from operation
         <where>
             <if test="operator != null and operator != ''">
                 and operator LIKE CONCAT('%',#{operator},'%')
@@ -149,7 +149,6 @@
                 and time &lt; #{endTime}
             </if>
         </where>
-        ORDER BY time desc
     </select>
 
 </mapper>

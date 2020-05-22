@@ -7,6 +7,9 @@ import com.fanr.graduation.entity.User;
 import com.fanr.graduation.service.ApprovalService;
 import com.fanr.graduation.service.OperationService;
 import com.fanr.graduation.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +24,7 @@ import java.util.*;
 
 import static com.fanr.graduation.common.Email.sendEmail;
 
+@Api(tags = "用户操作接口")
 @RestController
 @RequestMapping("/api/user")
 public class UserController {

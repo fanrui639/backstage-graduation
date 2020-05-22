@@ -49,3 +49,10 @@ mybatis:
 # Please change this to the path where you want the uploaded files to be stored.
 #file.path=G:\\file
 
+#
+#logging:
+#  level:
+#    com:
+#      fanr:
+#        graduation:
+#          mapper: debug

@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.fanr</groupId>
     <artifactId>graduation</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.6-SNAPSHOT</version>
     <name>graduation</name>
     <description>Demo project for Spring Boot</description>
 
@@ -129,6 +129,13 @@
             <scope>true</scope>
         </dependency>
 
+        <!--  使用slf4j输出-->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.6</version>
+        </dependency>
+
         <!--转换为PDF文件o-->
         <dependency>
             <groupId>com.artofsolving</groupId>
@@ -195,6 +202,19 @@
             <version>0.0.3</version>
         </dependency>
 
+        <!-- swagger -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>2.5.0</version>
+        </dependency>
+        <!-- swagger-ui -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>2.5.0</version>
+        </dependency>
+
 
 
     </dependencies>
@@ -226,6 +246,13 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <!-- package时跳过测试 -->
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
             </plugin>
         </plugins>
     </build>

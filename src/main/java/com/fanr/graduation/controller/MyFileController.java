@@ -105,7 +105,7 @@ public class MyFileController {
         String ip = CusAccessObjectUtil.getIp2(request);
         Operation operation = new Operation();
         operation.setOperator(user.getUsername());
-        operation.setEvent("用户 " + user + " 上传文件 " + file.getOriginalFilename());
+        operation.setEvent("用户 " + user.getUsername() + " 上传文件 " + file.getOriginalFilename());
         operation.setTime(new Date());
         operation.setOperrationIp(ip);
         operation.setType("file");
@@ -195,7 +195,7 @@ public class MyFileController {
         String ip = CusAccessObjectUtil.getIp2(request);
         Operation operation = new Operation();
         operation.setOperator(user.getUsername());
-        operation.setEvent("用户 " + user + " 下载文件 " + myFile.getFileName());
+        operation.setEvent("用户 " + user.getUsername() + " 下载文件 " + myFile.getFileName());
         operation.setTime(new Date());
         operation.setOperrationIp(ip);
         operation.setType("file");
@@ -284,7 +284,7 @@ public class MyFileController {
             String ip = CusAccessObjectUtil.getIp2(request);
             Operation operation = new Operation();
             operation.setOperator(user.getUsername());
-            operation.setEvent("用户 " + user + " 删除文件 " + myFile.getFileName());
+            operation.setEvent("用户 " + user.getUsername() + " 删除文件 " + myFile.getFileName());
             operation.setTime(new Date());
             operation.setOperrationIp(ip);
             operation.setType("file");
@@ -342,7 +342,7 @@ public class MyFileController {
         String ip = CusAccessObjectUtil.getIp2(request);
         Operation operation = new Operation();
         operation.setOperator(user.getUsername());
-        operation.setEvent("用户 " + user + " 取消分享文件 " + myFile.getFileName());
+        operation.setEvent("用户 " + user.getUsername() + " 取消分享文件 " + myFile.getFileName());
         operation.setTime(new Date());
         operation.setOperrationIp(ip);
         operation.setType("file");
@@ -422,7 +422,7 @@ public class MyFileController {
         String ip = CusAccessObjectUtil.getIp2(request);
         Operation operation = new Operation();
         operation.setOperator(user.getUsername());
-        operation.setEvent("用户 " + user + " 预览文件 " + myFile.getFileName());
+        operation.setEvent("用户 " + user.getUsername() + " 预览文件 " + myFile.getFileName());
         operation.setTime(new Date());
         operation.setOperrationIp(ip);
         operation.setType("file");
@@ -449,6 +449,8 @@ public class MyFileController {
             while((length=bis.read(b)) != -1){
                 bos.write(b,0,b.length);
             }
+            bos.flush();
+            bos.close();
 
         }catch(Exception e){
             //TOOD Auto-generated catch block
@@ -467,17 +469,20 @@ public class MyFileController {
         }
         else if(f.isFile())
         {
-            //是文件的话，把文件名放到一个字符串中
-            String filename=f.getName();
-            //如果是“class”后缀文件，返回一个boolean型的值
-            if(filename.endsWith("class"))
-            {
-//                System.out.println("成功删除：："+f.getName());
-                //file.delete();
-            }else{
-//                System.out.println("开始删除");
-                f.delete();
-            }
+//            //是文件的话，把文件名放到一个字符串中
+//            String filename=f.getName();
+//            //如果是“class”后缀文件，返回一个boolean型的值
+//            if(filename.endsWith("class"))
+//            {
+////                System.out.println("成功删除：："+f.getName());
+//                //file.delete();
+//            }else{
+////                System.out.println("开始删除");
+//                f.delete();
+//            }
+
+            f.delete();
+
         }
     }
 
