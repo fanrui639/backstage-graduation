@@ -5,9 +5,12 @@ server:
       timeout: 72000
 
 spring:
+  main:
+    allow-bean-definition-overriding: true    #当遇到同样名字的时候，是否允许覆盖注册
+
   #数据库配置
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://175.24.88.103:3306/graduation?userUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
     username: root
     password: '@Fan201314'
@@ -39,6 +42,35 @@ spring:
     multipart:
       max-file-size: 50MB
 
+  #redis配置
+  reids:
+    #数据库索引
+    database: 0
+    #redis服务器地址
+    host: 175.24.88.103
+    #服务器连接端口
+    port: 6379
+    #服务器连接密码（默认为空）
+    password:
+    #连接池最大连接数（使用负值表示没有限制）
+    maxActive: 8
+    #连接池最大阻塞等待时间（使用负值表示没有限制）
+    maxWait: -1
+    #连接池中最大空闲连接
+    maxIdle: 8
+    #连接池中最小空闲连接
+    minIdle: 0
+    #连接超时时间（毫秒）
+    timeout: 0
+
+  security:
+    user:
+      name: admin
+      password: admin
+
+    ignored: /swagger-ui.html,/swagger-ui.html/*,/webjars/**,/error,/swagger-resources/**
+
+
 #spring集成Mybatis环境
 #pojo别名扫描包
 mybatis:
@@ -49,10 +81,12 @@ mybatis:
 # Please change this to the path where you want the uploaded files to be stored.
 #file.path=G:\\file
 
-#
+
 #logging:
 #  level:
 #    com:
 #      fanr:
 #        graduation:
 #          mapper: debug
+
+
